@@ -41,15 +41,15 @@ min_style          cg
 log                logs/log.opt
 minimize           1.0e-15 1.0e-15 10000 100000
 log logs/log.main append
-min_style          fire
+min_style          cg
 timestep           0.0005
 variable           tempstp     equal $(step)
 variable           CellMinStep equal ${tempstp}
-log logs/log.opt  append
+log logs/log.opt   append
 fix                opt_conp all box/relax tri 0.0 vmax 0.001
 minimize           1.0e-15 1.0e-15 10000 100000
 unfix              opt_conp
-log logs/log.main append
+log logs/log.main  append
 variable           AtomMinStep equal ${tempstp}
 variable           temppe      equal $(pe)
 variable           min_E       equal abs(${prev_E}-${temppe})

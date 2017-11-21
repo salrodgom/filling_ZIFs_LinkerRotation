@@ -5,7 +5,7 @@ n_cycles=1
 temperature=85.0
 pressure=0.0
 filling_mode="RASPA" # Rabdel_Code
-CyclesEvery=100
+CyclesEvery=2000
 InitCycles=$(echo "$CyclesEvery * 0.1" | bc -l | sed 's/\./ /g' | awk '{print $1}')
 MoviesEvery=$((CyclesEvery - 1))
 #
