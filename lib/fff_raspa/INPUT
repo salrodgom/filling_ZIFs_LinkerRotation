@@ -1,0 +1,29 @@
+SimulationType                MonteCarlo
+NumberOfCycles                CYCLESEVERY
+NumberOfInitializationCycles  INITCYCLES
+PrintPropertiesEvery          100
+PrintEvery                    100
+RandomSeed                    RANDOMSEED
+Forcefield                    Local
+#CutOff                        16.709 # sigma*4.9 # Tanaka et al.
+ChargeMethod                  None
+Framework                     0
+RemoveAtomNumberCodeFromLabel yes
+FrameworkName                 STRUCTURE
+UnitCells                     SUPERCELL
+ExternalTemperature           TEMPERATURE
+
+Movies             yes
+WriteMoviesEvery   MOVIESEVERY
+FlexibleFramework  yes
+
+Component 0 MoleculeName               GUEST
+            MoleculeDefinition         Local
+            FugacityCoefficient        1.0
+            TranslationProbability     1.0
+            RegrowProbability          0.0
+            RotationProbability        0.0
+            SwapProbability            0.0
+            WidomProbability           0.0
+            CFSwapLambdaProbability    0.0
+            CreateNumberOfMolecules    N_BEADS
