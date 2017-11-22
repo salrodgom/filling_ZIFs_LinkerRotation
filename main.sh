@@ -5,7 +5,7 @@ n_cycles=1
 temperature=85.0
 pressure=0.0
 filling_mode="RASPA" # Rabdel_Code
-CyclesEvery=2000
+CyclesEvery=5000
 InitCycles=$(echo "$CyclesEvery * 0.1" | bc -l | sed 's/\./ /g' | awk '{print $1}')
 MoviesEvery=$((CyclesEvery - 1))
 #
@@ -327,7 +327,7 @@ cd ${main_folder}
   update_name
   sed "s/Ar /Xe /g" ${previous_name}.cif > ${CyclesNameFile}.cif
   #
-  remove_guest="true"
+  remove_guest="false"
   flags_cif2lammps="post-Xe-Ar-exchange"
   interface_adsorption_lammps
   em_md_lammps
