@@ -293,7 +293,7 @@ function resumen {
 }
 ##############################################################
 # main program:
-for n_beads in 200 375 425 500 350 400 450 ; do
+for n_beads in 0 350 ; do
 main_folder=${structure}_${temperature}_${n_beads}_${seed}
 mkdir ${main_folder}
 cd ${main_folder}
