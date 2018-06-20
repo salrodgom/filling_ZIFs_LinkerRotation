@@ -15,7 +15,7 @@ kspace_style                 ewald 1e-8
 read_data                    FILENAME.data
 pair_modify                  mix arithmetic shift yes tail no table 0
 special_bonds                lj 0.0 0.0  0.00000 coul 0.0 0.0  0.00000
-variable TK                  equal 298.15
+variable TK                  equal 600.0
 variable Pbar                equal 0.0
 variable dt                  equal 0.0005
 variable tdamp               equal 100*${dt}
@@ -73,6 +73,7 @@ variable MacroStep loop 10
  dump        traj_all   all       custom ${ndump} movs/all.lammpstrj       element xs ys zs
  dump_modify traj_all   element ELEMENTS  first yes sort id
  reset_timestep 0
+ change_box all x scale 1.1 y scale 1.1 z scale 1.1 xy scale 1.1 xz scale 1.1 yz scale 1.1 triclinic remap
  velocity all create ${TK} ${RandomSeed}
  fix      2 all langevin ${TK} ${TK} ${tdamp} ${RandomSeed}
  fix      3 all nve

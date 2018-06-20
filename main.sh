@@ -1,7 +1,7 @@
 #!/bin/bash
 CIFFile=$1
 nCPU=$2
-n_cycles=1
+n_cycles=3
 temperature=85.0
 pressure=0.0
 filling_mode="RASPA" # Rabdel_Code
