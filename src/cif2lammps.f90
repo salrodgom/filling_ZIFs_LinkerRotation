@@ -2,7 +2,7 @@ program zif_cif2gin
  use iso_fortran_env
  implicit none
 ! locals
- integer             :: i,j,k,l,h,m,n,ierr
+ integer             :: i,j,k,l,h,hh,m,n,ierr
  integer             :: ii,jj,kk,ll
  real                :: r = 1.0e12
 !parameters
@@ -199,7 +199,8 @@ program zif_cif2gin
   if(input_from_RASPA)then
    read(line,*,iostat=ierr)atom(i)%label_from_CIFFile, atom(i)%label, (atom(i)%xyzs(j,1),j=1,3), atom(i)%charge
   elseif(charges_flag) then
-   read(line,*,iostat=ierr)atom(i)%label,(atom(i)%xyzs(j,1),j=1,3),atom(i)%charge
+   !read(line,*,iostat=ierr)atom(i)%label,(atom(i)%xyzs(j,1),j=1,3),atom(i)%charge
+   read(line,*,iostat=ierr)atom(i)%label,(atom(i)%xyzs(j,1),j=1,3)
   else if(adsorption_fast_atom_saturation_INPUT) then
    read(line,*,iostat=ierr)atom(i)%label_from_CIFFile, atom(i)%label, (atom(i)%xyzs(j,1),j=1,3), atom(i)%charge
   else
@@ -246,7 +247,14 @@ program zif_cif2gin
        ((atom(i)%element==1.and.atom(j)%element==16).or. &
        (atom(i)%element==16.and.atom(j)%element==1)).or. &
        ((atom(i)%element==8.and.atom(j)%element==30).or. &
-       (atom(i)%element==30.and.atom(j)%element==8)) )then
+       (atom(i)%element==30.and.atom(j)%element==8)).or. &
+       ((atom(i)%element==1.and.atom(j)%element==48).or. &
+        (atom(i)%element==48.and.atom(j)%element==1)).or.&
+       ((atom(i)%element==6.and.atom(j)%element==48).or. &
+        (atom(i)%element==48.and.atom(j)%element==6)).or.&
+       ((atom(i)%element==8.and.atom(j)%element==48).or. &
+       (atom(i)%element==48.and.atom(j)%element==8)).or. &
+       (atom(i)%label=="C3".and.atom(j)%label=="C3")) then
      ConnectedAtoms(i,j)=.false.
      ConnectedAtoms(j,i)=.false.
      atom(i)%degree=atom(i)%degree-1
@@ -266,6 +274,7 @@ program zif_cif2gin
  if ( modify_topology_flag ) then
 ! charge for topologies:
 !charge +0.6918  # Zn
+!charge +0.6918  # Cd
 !charge +0.2045  # C4
 !charge -0.3879  # N1
 !charge -0.0839  # C2
@@ -282,6 +291,9 @@ program zif_cif2gin
    else if( atom(i)%element==30) then
     atom(i)%new_label='Zn  '
     atom(i)%charge = +0.6918
+   else if( atom(i)%element==48) then
+    atom(i)%new_label='Cd  '
+    atom(i)%charge = +0.6918
    else if( atom(i)%element==16) then
     atom(i)%new_label='S1  '
     atom(i)%charge = +0.312
@@ -295,12 +307,14 @@ program zif_cif2gin
     l=0 ! C-counter
     k=0 ! S-counter
     n=0 ! O-counter
+    hh=0 ! H-counter
     scan_for_N_C_S_atoms: do j=1,n_atoms
      if( i/=j.and.ConnectedAtoms(i,j) )then
-      if( atom(j)%element==7 ) h=h+1 
-      if( atom(j)%element==6 ) l=l+1
-      if( atom(j)%element==16) k=k+1
-      if( atom(j)%element==8 ) n=n+1
+      if( atom(j)%element==7 ) h=h+1   ! N 
+      if( atom(j)%element==6 ) l=l+1   ! C
+      if( atom(j)%element==16) k=k+1   ! S
+      if( atom(j)%element==8 ) n=n+1   ! O
+      if( atom(j)%element==1 ) hh=hh+1 ! H
      end if
     end do scan_for_N_C_S_atoms
     if( h==1 .and. l==1 .and. k==0 .and. n==0 ) then
@@ -330,7 +344,13 @@ program zif_cif2gin
      write(6,*)'C-S bonds detected:',k
      write(6,*)'C-N bonds detected:',h
      write(6,*)'C-C bonds detected:',l
+     write(6,*)'C-H bonds detected:',hh
      write(6,*)'Degree:',  atom(i)%degree
+     do j=1,n_atoms
+      if( i/=j.and.ConnectedAtoms(i,j) )then
+       write(6,*)atom(i)%new_label,'(',atom(i)%label,')',atom(j)%new_label,'(',atom(j)%label,')'
+      end if
+     end do
      write(6,*)'------------------------------------------------------------'
      stop
     end if
@@ -1359,13 +1379,18 @@ program zif_cif2gin
    case('Zn  ','Zn0 ':'Zn99')
     Z=30
     m=65.37
-    s=1.6
+    s=1.60
     Zlabel='Zn'
    case('Cl  ',' Cl ','Cl0 ':'Cl99')
     Z=17
     m=35.453
     s=1.0
     Zlabel='Cl'
+   case('Cd  ',' Cd ','Cd0 ':'Cd99')
+    Z=48
+    m=112.414
+    s=1.70
+    Zlabel='Cd'
    case default
     write(6,'(a1,a4,a1)')"'",label,"'"
     STOP 'Atom unknowed'

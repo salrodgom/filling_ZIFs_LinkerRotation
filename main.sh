@@ -185,12 +185,12 @@ function em_md_lammps {
   cp ${lammps_files_folder}/${lammps_file_lib} $folder/in.lmp
   mv atom_types_for_dump.txt $folder/.
   cd $folder
-   sed -i "s/TEMPERATURE/${temperature}/g" in.lmp
-   sed -i "s/RANDOMSEED/${seed}/g"   in.lmp
-   sed -i "s/PRESSURE/${pressure}/g" in.lmp
-   sed -i "s/FILENAME/${CyclesNameFile}/g" in.lmp
+   sed -i "s/TEMPERATURE/600/g"                                                  in.lmp
+   sed -i "s/RANDOMSEED/${seed}/g"                                               in.lmp
+   sed -i "s/PRESSURE/${pressure}/g"                                             in.lmp
+   sed -i "s/FILENAME/${CyclesNameFile}/g"                                       in.lmp
    elements=$(cat atom_types_for_dump.txt | sed 's/[0-9]//g' | sed 's/  / /g')
-   sed -i "s/ELEMENTS/${elements}/g" in.lmp
+   sed -i "s/ELEMENTS/${elements}/g"                                             in.lmp
    go_lammps
    lammps_raspa
   cd ..
@@ -293,7 +293,7 @@ function resumen {
 }
 ##############################################################
 # main program:
-for n_beads in 0 350 ; do
+for n_beads in 420 ; do
 main_folder=${structure}_${temperature}_${n_beads}_${seed}
 mkdir ${main_folder}
 cd ${main_folder}

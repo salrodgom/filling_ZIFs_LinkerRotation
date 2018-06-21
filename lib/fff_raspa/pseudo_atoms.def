@@ -1,22 +1,22 @@
 #number of pseudo atoms
-4
+20
 #type      print   as    chem  oxidation   mass        charge   polarization B-factor radii  connectivity anisotropic anisotropic-type   tinker-type
-C1         yes     C     C     0           12.0107    +0.4291   0.0          1.0       0.68  0            0           relative           0
-C2         yes     C     C     0           12.0107    -0.0839   0.0          1.0       0.68  0            0           relative           0
-C3         yes     C     C     0           12.0107    -0.4526   0.0          1.0       0.68  0            0           relative           0
-C4         yes     C     C     0           12.0107    +0.2045   0.0          1.0       0.68  0            0           relative           0
-C5         yes     C     C     0           12.0107     0.0      0.0          1.0       0.68  0            0           relative           0
-C6         yes     C     C     0           12.0107    -0.10745  0.0          1.0       0.68  0            0           relative           0
-C7         yes     C     C     0           12.0107    -0.3695   0.0          1.0       0.68  0            0           relative           0
-C8         yes     C     C     0           12.0107    -0.2620   0.0          1.0       0.68  0            0           relative           0
-C9         yes     C     C     0           12.0107    -0.393    0.0          1.0       0.68  0            0           relative           0
-H1         yes     H     H     0           1.00794    +0.1310   0.0          1.0       0.23  0            0           relative           0
-H2         yes     H     H     0           1.00794    +0.1310   0.0          1.0       0.23  0            0           relative           0
-H3         yes     H     H     0           1.00794    +0.1310   0.0          1.0       0.23  0            0           relative           0
-H4         yes     H     H     0           1.00794    +0.1310   0.0          1.0       0.23  0            0           relative           0
-N          yes     N     N     0           14.00674   -0.3879   0.0          1.0       0.7   0            0           relative           0
+C1         yes     C1    C     0           12.0107    +0.4291   0.0          1.0       0.68  0            0           relative           0
+C2         yes     C2    C     0           12.0107    -0.0839   0.0          1.0       0.68  0            0           relative           0
+C3         yes     C3    C     0           12.0107    -0.4526   0.0          1.0       0.68  0            0           relative           0
+C4         yes     C4    C     0           12.0107    +0.2045   0.0          1.0       0.68  0            0           relative           0
+C5         yes     C5    C     0           12.0107     0.0      0.0          1.0       0.68  0            0           relative           0
+C6         yes     C6    C     0           12.0107    -0.10745  0.0          1.0       0.68  0            0           relative           0
+C7         yes     C7    C     0           12.0107    -0.3695   0.0          1.0       0.68  0            0           relative           0
+C8         yes     C8    C     0           12.0107    -0.2620   0.0          1.0       0.68  0            0           relative           0
+C9         yes     C9    C     0           12.0107    -0.393    0.0          1.0       0.68  0            0           relative           0
+H1         yes     H1    H     0           1.00794    +0.1310   0.0          1.0       0.23  0            0           relative           0
+H2         yes     H2    H     0           1.00794    +0.1310   0.0          1.0       0.23  0            0           relative           0
+H3         yes     H3    H     0           1.00794    +0.1310   0.0          1.0       0.23  0            0           relative           0
+H4         yes     H4    H     0           1.00794    +0.1310   0.0          1.0       0.23  0            0           relative           0
+N1         yes     N1    N     0           14.00674   -0.3879   0.0          1.0       0.7   0            0           relative           0
 Zn         yes     Zn    Zn    0           65.37      +0.6918   0.0          1.0       1.45  0            0           relative           0
-Cd
+Cd         yes     Cd    Cd    0          112.414     +0.6918   0.0          1.0       2.2   0            0           relative           0
 He         yes     He    He    0           4.002602    0.0      0.0          1.0       1.0   0            0           relative           0
 Ar         yes     Ar    Ar    0          39.948       0.0      0.0          1.0       0.7   0            0           relative           0
 Kr         yes     Kr    Kr    0          83.798       0.0      0.0          1.0       1.00  0            0           relative           0
