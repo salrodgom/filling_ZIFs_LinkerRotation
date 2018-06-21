@@ -852,14 +852,22 @@ program zif_cif2gin
           adjustl(trim(ourlabel(2)))==adjustl(trim(label(1)))))then
        read(passing,'(a,a)')type_fff,variables
        if(adjustl(trim(type_fff))/='none')then
-        !write(6,*)'bond:',line
-        read(variables,*) p1,p2
-        select case(units)
-         case('kcal/mol','kcal/mol/A/A')
-          p1=kcalmol2ev(p1) ! kcal/mol/A/A
-          p2=p2             ! A
-        end select
-        write(string,*) p1,p2,' # ',type_fff
+        select case(adjustl(trim(type_fff)))
+        case("harmonic")
+         read(variables,*) p1,p2
+         select case(units)
+          case('kcal/mol','kcal/mol/A/A')
+           p1=kcalmol2ev(p1) ! kcal/mol/A/A
+           p2=p2             ! A
+          case('K','K/A/A')
+           p1=0.5*K2eV(p1)
+           p2=p2
+         end select
+         write(string,*) p1,p2,' # ',type_fff
+        case default
+         write(6,'(a,1x,a)')'Unknown bond potential:', adjustl(trim(type_fff))
+         stop
+        end select 
        else
         write(string,*) 0.0,0.0,' # ',type_fff
        end if
@@ -893,14 +901,22 @@ program zif_cif2gin
           adjustl(trim(ourlabel(3)))==adjustl(trim(label(1)))))then
        read(passing,'(a,a)')type_fff,variables
        if(adjustl(trim(type_fff))/='none')then
-        !write(6,*)'angle:',line
-        read(variables,*) p1,p2
-        select case(units)
-         case('kcal/mol','kcal/mol/rad/rad')
-          p1=kcalmol2ev(p1) ! kcal/mol/rad/rad
-          p2=p2             ! deg
+        select case(adjustl(trim(type_fff)))
+        case("harmonic")
+         read(variables,*) p1,p2
+         select case(units)
+          case('kcal/mol','kcal/mol/rad/rad')
+           p1=kcalmol2ev(p1) ! kcal/mol/A/A
+           p2=p2             ! A
+          case('K','K/rad/rad')
+           p1=0.5*K2eV(p1)
+           p2=p2
+         end select
+         write(string,*) p1,p2,' # ',type_fff
+        case default
+         write(6,'(a,1x,a)')'Unknown bend potential:', adjustl(trim(type_fff))
+         stop
         end select
-        write(string,*) p1,p2, ' # ',type_fff
        else
         write(string,*)0.0,0.0,' # ',type_fff
        end if
@@ -910,7 +926,7 @@ program zif_cif2gin
     end do
    case('tors')
     inittors: do
-     read(u,'(a)') line
+     read(u,'(a)')line
      if(line(1:15)=='Dihedral Coeffs') then
       read(line(16:),'(a)') units
       units=adjustl(trim(units))
@@ -934,15 +950,26 @@ program zif_cif2gin
           adjustl(trim(ourlabel(4)))==adjustl(trim(label(1)))))then
        read(passing,'(a,a)')type_fff,variables
        if(adjustl(trim(type_fff))/='none')then
-        read(variables,*) p0,p1,p4,p2
-        select case(units)
-         case('kcal/mol')
-          p0=p0
-          p1=kcalmol2ev(p1) ! kcal/mol/rad/rad
-          p4=p4
-          p2=p2             ! deg
+        select case(adjustl(trim(type_fff)))
+        case("fourier")
+         read(variables,*) p0,p1,p4,p2
+         select case(units)
+          case('kcal/mol')
+           p0=p0
+           p1=kcalmol2ev(p1) ! kcal/mol/rad/rad
+           p4=p4
+           p2=p2             ! deg
+          case('K','K/rad/rad')
+           p0=p0
+           p1=K2eV(p1)
+           p2=p2
+           p4=p4
+         end select
+         write(string,*) p0,p1,p4,p2,' # ',type_fff
+        case default
+         write(6,'(a,1x,a)')'Unknown dihedral potential:', adjustl(trim(type_fff))
+         stop
         end select
-        write(string,*)p0,p1,p4,p2,' # ',type_fff
        else
         write(string,*)1,0.0,1,0.0,' # ',type_fff
        end if
@@ -967,42 +994,53 @@ program zif_cif2gin
       exit fff
      else if(line(1:1)/="#".or.line(1:1)/=" ")then
       read(line,'(4(a4,1x),a)')(ourlabel(ii),ii=1,4),passing
-      if((adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&
-          adjustl(trim(ourlabel(2)))==adjustl(trim(label(2))).and.&
+      if((adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&  ! i j k l
+          adjustl(trim(ourlabel(2)))==adjustl(trim(label(2))).and.&  ! 1 2 3 4
           adjustl(trim(ourlabel(3)))==adjustl(trim(label(3))).and.&
           adjustl(trim(ourlabel(4)))==adjustl(trim(label(4)))).or.&
-         (adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&
-          adjustl(trim(ourlabel(2)))==adjustl(trim(label(2))).and.&
+         (adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&  ! i j l k
+          adjustl(trim(ourlabel(2)))==adjustl(trim(label(2))).and.&  ! 1 2 4 3
           adjustl(trim(ourlabel(3)))==adjustl(trim(label(4))).and.&
           adjustl(trim(ourlabel(4)))==adjustl(trim(label(3)))).or.&
-         (adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&
-          adjustl(trim(ourlabel(2)))==adjustl(trim(label(4))).and.&
-          adjustl(trim(ourlabel(3)))==adjustl(trim(label(3))).and.&
+         (adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&  ! i k j l
+          adjustl(trim(ourlabel(2)))==adjustl(trim(label(3))).and.&  ! 1 3 2 4
+          adjustl(trim(ourlabel(3)))==adjustl(trim(label(2))).and.&
+          adjustl(trim(ourlabel(4)))==adjustl(trim(label(4)))).or.&
+         (adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&  ! i k l j
+          adjustl(trim(ourlabel(2)))==adjustl(trim(label(3))).and.&  ! 1 3 4 2
+          adjustl(trim(ourlabel(3)))==adjustl(trim(label(4))).and.&
           adjustl(trim(ourlabel(4)))==adjustl(trim(label(2)))).or.&
-         (adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&
-          adjustl(trim(ourlabel(2)))==adjustl(trim(label(3))).and.&
-          adjustl(trim(ourlabel(3)))==adjustl(trim(label(2))).and.&
-          adjustl(trim(ourlabel(4)))==adjustl(trim(label(4)))).or.&
-         (adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&
-          adjustl(trim(ourlabel(2)))==adjustl(trim(label(4))).and.&
+         (adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&  ! i l j k
+          adjustl(trim(ourlabel(2)))==adjustl(trim(label(4))).and.&  ! 1 4 2 3
           adjustl(trim(ourlabel(3)))==adjustl(trim(label(2))).and.&
           adjustl(trim(ourlabel(4)))==adjustl(trim(label(3)))).or.&
-         (adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&
-          adjustl(trim(ourlabel(2)))==adjustl(trim(label(3))).and.&
-          adjustl(trim(ourlabel(3)))==adjustl(trim(label(4))).and.&
+         (adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&  ! i l k j
+          adjustl(trim(ourlabel(2)))==adjustl(trim(label(4))).and.&  ! 1 4 3 2
+          adjustl(trim(ourlabel(3)))==adjustl(trim(label(3))).and.&
           adjustl(trim(ourlabel(4)))==adjustl(trim(label(2)))) )then
        read(passing,'(a,a)')type_fff,variables
        if(adjustl(trim(type_fff))/='none')then
-        read(variables,*) p1,p2,p3
-        select case(units)
-         case('kcal/mol')
-          p1=kcalmol2ev(p1) ! kcal/mol/rad/rad
-          p2=p2             ! sign (+/-)
-          p3=p3             ! -
+        select case(adjustl(trim(type_fff)))
+        case("cvff")         ! p1*(1+p0*cos(p4*x))
+         read(variables,*) p1,p0,p4
+         write(6,*)        p1,p0,p4
+         select case(units)
+          case('kcal/mol')
+           p1=kcalmol2ev(p1) ! kcal/mol/rad/rad
+           p0=p0             ! [-]
+           p4=p4             ! [-]
+          case('K','K/rad/rad')
+           p1=K2eV(p1)
+           p0=p0
+           p4=p4
+         end select
+         write(string,*) p1,p0,p4,' # ',type_fff
+        case default
+         write(6,'(a,1x,a)')'Unknown improper potential:', adjustl(trim(type_fff))
+         stop
         end select
-        write(string,*) p1,p2,p3,' # ',type_fff
        else
-        write(string,*)0.0,-1,0,' # ',type_fff
+        write(string,*) 0.0,1,0,' # ',type_fff
        end if
        exit fff
       end if
@@ -1032,7 +1070,6 @@ program zif_cif2gin
        read(passing,'(a,a)')type_fff,variables
        if(adjustl(trim(type_fff))/='none')then
         read(variables,*) p1,p2
-        !write(6,*)p1,p2
         select case(units)
          case('kcal/mol')
           p1=kcalmol2ev(p1) ! kcal/mol
@@ -1217,17 +1254,17 @@ program zif_cif2gin
    write(u,'(i4,3x,a,a,a)')i,adjustl(str(1:Clen_trim(str))),' # ',tors_type_string(i)
   end do
   write(u,*)' '
-  !write(u,'(a)')'Improper Coeffs'
-  !write(u,*)' '
-  !do i=1,n_impr_types
-  ! read(tors_type_string(i),'(4a4)')(label(ii),ii=1,4)
-  ! forall (ii=1:80)
-  !  str(ii:ii)=" "
-  ! end forall
-  ! call search_forcefield(str,'impr',label)
-  ! write(u,'(i4,3x,a,a,a)')i,adjustl(str(1:Clen_trim(str))),' # ',impr_type_string(i)
-  !end do
-  !write(u,*)' '
+  write(u,'(a)')'Improper Coeffs'
+  write(u,*)' '
+  do i=1,n_impr_types
+   read(impr_type_string(i),'(4a4)')(label(ii),ii=1,4)
+   forall (ii=1:80)
+    str(ii:ii)=" "
+   end forall
+   call search_forcefield(str,'impr',label)
+   write(u,'(i4,3x,a,a,a)')i,adjustl(str(1:Clen_trim(str))),' # ',impr_type_string(i)
+  end do
+  write(u,*)' '
   write(u,'(a)')'Pair Coeffs'
   write(u,*)' '
   do i=1,n_atom_types
@@ -1651,6 +1688,14 @@ end function
   END FORALL
   DISTANCE = sqrt(dist(1)*dist(1) + dist(2)*dist(2) + dist(3)*dist(3))
  END FUNCTION
+!
+ real function K2eV(x)
+  implicit none 
+  real    :: x
+  real,parameter :: kB_1=11604.52211052
+  K2eV=x/kB_1
+  return
+ end function
 !
  real function kcalmol2ev(x)
   implicit none
