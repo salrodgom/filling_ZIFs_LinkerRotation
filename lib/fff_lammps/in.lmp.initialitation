@@ -9,7 +9,7 @@ box tilt large
 bond_style                   harmonic
 angle_style                  harmonic
 dihedral_style               fourier
-improper_style               none
+improper_style               cvff
 pair_style                   lj/cut/coul/long 14.0
 kspace_style                 ewald 1e-8
 read_data                    FILENAME.data
