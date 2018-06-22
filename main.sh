@@ -1,11 +1,15 @@
 #!/bin/bash
 CIFFile=$1
 nCPU=$2
-n_cycles=3
+n_cycles=2
 temperature=85.0
 pressure=0.0
 filling_mode="RASPA" # Rabdel_Code
 CyclesEvery=5000
+Xe_density=2942.0    # Xe, liquid phase [g/L]
+Xe_m=131.293         # Xe,              [g/mol]
+N_Avogadro="6.0221415*10^(23)"
+A32L="1*10^(27)"
 InitCycles=$(echo "$CyclesEvery * 0.1" | bc -l | sed 's/\./ /g' | awk '{print $1}')
 MoviesEvery=$((CyclesEvery - 1))
 #
@@ -185,7 +189,7 @@ function em_md_lammps {
   cp ${lammps_files_folder}/${lammps_file_lib} $folder/in.lmp
   mv atom_types_for_dump.txt $folder/.
   cd $folder
-   sed -i "s/TEMPERATURE/600/g"                                                  in.lmp
+   sed -i "s/TEMPERATURE/550/g"                                                  in.lmp
    sed -i "s/RANDOMSEED/${seed}/g"                                               in.lmp
    sed -i "s/PRESSURE/${pressure}/g"                                             in.lmp
    sed -i "s/FILENAME/${CyclesNameFile}/g"                                       in.lmp
@@ -255,16 +259,25 @@ function lammps_raspa {
 }
 function CIF111toSupercell {
  check_supercell
+ cp ${raspa_files_folder}/*.def .
  echo "SimulationType  MC
-NumberOfCycles               0
+NumberOfCycles               10000
 NumberOfInitializationCycles 0
-PrintEvery                   1
-Forcefield  GenericMOFs
-Framework 0
+PrintEvery                   100
+ChargeMethod                 None
+Forcefield                   GenericMOFs
+Framework                    0
 FrameworkName ${structure}_${seed}
-UnitCells $ua $ub $uc" > simulation.input
+UnitCells $ua $ub $uc
+Component 0 MoleculeName               helium
+            MoleculeDefinition         Local
+            FugacityCoefficient        1.0
+            WidomProbability           1.0
+            CreateNumberOfMolecules    0 " > simulation.input
  ${HOME}/RASPA/simulations/bin/simulate
  mv Movies/System_0/Framework_0_final_${ua}_${ub}_${uc}_P1.cif ${CIFTemporallyFile}
+ HVF=$(grep "Average Widom Rosenbluth-weight:" Output/System_0/output_*.data | awk '{print $5}')
+ volume_structure=$(grep "Volume:" Output/System_0/output_*.data | tail -n2 | head -n1 | awk '{print $2}')
  sed -i '/^$/d' ${CIFTemporallyFile}
 }
 function distance_angle_measure {
@@ -293,8 +306,8 @@ function resumen {
 }
 ##############################################################
 # main program:
-for n_beads in 420 ; do
-main_folder=${structure}_${temperature}_${n_beads}_${seed}
+for saturation_degre in 1.0 0.95 0.90 ; do
+main_folder=${structure}_${temperature}_${saturation_degre}_${seed}
 mkdir ${main_folder}
 cd ${main_folder}
  cp ${lib_folder}/forcefield.lib .
@@ -311,6 +324,7 @@ cd ${main_folder}
   # 
   guest='argon'
   let cycle++
+  n_beads=$(echo "scale=0; $Xe_density * ${volume_structure} * ${HVF} * ${N_Avogadro}/ ( ${Xe_m} * ${A32L})" | bc -lq)
   cycle_name=$(echo $cycle | awk '{ printf("%02d\n", $1) }')
   fill_with_guest
   # 

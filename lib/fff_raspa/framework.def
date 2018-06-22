@@ -1,5 +1,5 @@
 #CoreShells bond  BondDipoles UreyBradley bend  inv  tors improper-torsion bond/bond bond/bend bend/bend stretch/torsion bend/torsion
-          0   20            0           0   40    0    49                7         0         0         0               0            0
+          0   20            0           0   40    0    48                7         0         0         0               0            0
 #bond stretch atom n1-n2, equilibrium distance, bondforce-constant
 C2 C2    HARMONIC_BOND     521941   1.346
 C5 C5    HARMONIC_BOND     521941   1.360
