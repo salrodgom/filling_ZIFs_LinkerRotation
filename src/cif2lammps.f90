@@ -313,7 +313,6 @@ program zif_cif2gin
      atom(i)%new_label = "C2  "
      atom(i)%charge = -0.0839
      flag_naming=.false.
-     write(6,*) atom(i)%new_label, 'found'
     else if( h==2 .and. l==0 .and. k==0 .and. n==0 .and. hh==1 ) then
      atom(i)%new_label = "C4  "
      atom(i)%charge= +0.259300001
