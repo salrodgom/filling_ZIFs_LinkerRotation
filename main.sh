@@ -1,4 +1,5 @@
 #!/bin/bash
+# Salvador Rodriguez Gomez, 2018/06
 CIFFile=$1
 nCPU=$2
 n_cycles=2
