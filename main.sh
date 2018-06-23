@@ -1,5 +1,6 @@
 #!/bin/bash
 # Salvador Rodriguez Gomez, 2018/06
+# Variables
 CIFFile=$1
 nCPU=$2
 n_cycles=2
@@ -7,13 +8,14 @@ temperature=85.0
 pressure=0.0
 filling_mode="RASPA" # Rabdel_Code
 CyclesEvery=5000
+modify_supercell="no"
+# parameters
 Xe_density=2942.0    # Xe, liquid phase [g/L]
 Xe_m=131.293         # Xe,              [g/mol]
 N_Avogadro="6.0221415*10^(23)"
 A32L="1*10^(27)"
 InitCycles=$(echo "$CyclesEvery * 0.1" | bc -l | sed 's/\./ /g' | awk '{print $1}')
 MoviesEvery=$((CyclesEvery - 1))
-#
 structure=$(echo $CIFFile | sed 's/\.cif//g')
 seed=$(od --read-bytes=3 --address-radix=n --format=uL /dev/urandom | tr --delete " ")
 while [ $(echo "$seed > 900000000" | bc -l) == 1 ] || [ $(echo "$seed < 0" | bc -l) == 1 ] ; do
@@ -342,6 +344,7 @@ for saturation_degre in 1.0 0.95 0.90 ; do
 main_folder=${structure}_${temperature}_${saturation_degre}_${seed}
 mkdir ${main_folder}
 cd ${main_folder}
+ # Initial Optimisation with calculation of Elastic Constants
  cp ${lib_folder}/forcefield.lib .
  cp ../${CIFFile} ${CIFTemporallyFile}
  cycle=0
@@ -354,26 +357,19 @@ cd ${main_folder}
  energy0=$(tail -n1 ${CyclesNameFile}_emmd/logs/minimization.txt | awk '{print $5}')
  elastic_constants
  for i in $(seq 1 ${n_cycles}) ; do
-  # 
+  # RASPA MC simulation of a adsorption of Argon 
   guest='argon'
   let cycle++
   n_beads=$(echo "scale=0; $Xe_density * ${volume_structure} * ${HVF} * ${N_Avogadro}/ ( ${Xe_m} * ${A32L})" | bc -lq)
   cycle_name=$(echo $cycle | awk '{ printf("%02d\n", $1) }')
   fill_with_guest
-  # 
-  #flags_cif2lammps="post-loading"
-  #interface_adsorption_lammps
-  #remove_guest="false"
-  #em_md_lammps
-  #energy=$(tail -n1 ${CyclesNameFile}_emmd/logs/minimization.txt | awk '{print $5}')
-  #statu=$(echo "scale=4; ($energy - $energy0)/(${n_Ar})" | bc -l)
-  #distance_angle_measure
   previous_name=${CyclesNameFile}
+  # Change Argon by Xenon atoms:
   guest='xenon'
   cycle_name=$(echo $cycle | awk '{ printf("%02d\n", $1) }')
   update_name
   sed "s/Ar /Xe /g" ${previous_name}.cif > ${CyclesNameFile}.cif
-  #
+  # Run a Optimisation / Molecular Dynamics
   remove_guest="false"
   flags_cif2lammps="post-Xe-Ar-exchange"
   interface_adsorption_lammps
@@ -381,6 +377,7 @@ cd ${main_folder}
   energy=$(tail -n1 ${CyclesNameFile}_emmd/logs/minimization.txt | awk '{print $5}')
   statu=$(echo "scale=4; ($energy - $energy0)/(${n_Ar})" | bc -l)
   distance_angle_measure
+  elastic_constants
  done
  clean_binaries
 cd ..
