@@ -144,11 +144,11 @@ function elastic_constants {
  if [ ! -d $folder ] ; then
   mkdir $folder
   cd $folder
-   cp ../${CIFTemporallyFile} p1_topol.cif
+   cp ../${CIFTemporallyFile} p1.cif
    cp ${raspa_files_folder}/*.def .
    cp ${raspa_files_folder}/INPUT.elastic_constants simulation.input
-   cp ../cif2lammps .
-   cp ../forcefield.lib
+   cp ../forcefield.lib .
+   cp ../cif2lammps -c p1.cif -wq -S
    ./cif2lammps -c p1_topol.cif -wq -S
    go_raspa
   cd ..
