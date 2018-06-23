@@ -63,8 +63,8 @@ program pdb2cif
      xinbox(j,id(i)) = xinbox(j,id(i)) - average(j)
     end forall
     forall ( j=1:3 )
-     !xcryst(j,id(i)) =mod(vr(j,1)*xinbox(1,id(i))+vr(j,2)*xinbox(2,id(i))+vr(j,3)*xinbox(3,id(i))+100.0,1.0)
-     xcryst(j,id(i)) = vr(j,1)*xinbox(1,id(i))+vr(j,2)*xinbox(2,id(i))+vr(j,3)*xinbox(3,id(i))
+     xcryst(j,id(i)) =mod(vr(j,1)*xinbox(1,id(i))+vr(j,2)*xinbox(2,id(i))+vr(j,3)*xinbox(3,id(i))+100.0,1.0)
+     !xcryst(j,id(i)) = vr(j,1)*xinbox(1,id(i))+vr(j,2)*xinbox(2,id(i))+vr(j,3)*xinbox(3,id(i))
     end forall
  enddo coor_pdb
 ! escribo el cif

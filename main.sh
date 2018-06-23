@@ -11,7 +11,9 @@ CyclesEvery=5000
 modify_supercell="no"
 # parameters
 Xe_density=2942.0    # Xe, liquid phase [g/L]
-Xe_m=131.293         # Xe,              [g/mol]
+Ar_density=1395.4    # Ar, liquid phase [g/L]
+Xe_m=131.293         # Xe, mass         [g/mol]
+Ar_m=39.948          # Ar, mass         [g/mol]
 N_Avogadro="6.0221415*10^(23)"
 A32L="1*10^(27)"
 InitCycles=$(echo "$CyclesEvery * 0.1" | bc -l | sed 's/\./ /g' | awk '{print $1}')
@@ -92,9 +94,15 @@ function mc_muVT_raspa {
  sed -i "s/CYCLESEVERY/${CyclesEvery}/g" simulation.input
  sed -i "s/INITCYCLES/${InitCycles}/g" simulation.input
  sed -i "s/MOVIESEVERY/${MoviesEvery}/g" simulation.input
- sed -i "s/N_BEADS/${n_beads}/g"         simulation.input
- check_supercell
+ if [ "${modify_supercell}" == "yes" ] ; then
+  check_supercell
+ else
+  ua=1
+  ub=1
+  uc=1
+ fi
  sed -i "s/SUPERCELL/$ua $ub $uc/g" simulation.input
+ sed -i "s/N_BEADS/${n_beads}/g"    simulation.input
  makeCIFTopology
  echo "Run RASPA"
  go_raspa
@@ -149,8 +157,8 @@ function elastic_constants {
    cp ../${CIFTemporallyFile} p1.cif
    cp ${raspa_files_folder}/*.def .
    cp ${raspa_files_folder}/INPUT.elastic_constants simulation.input
-   cp ../forcefield.lib .
-   cp ../cif2lammps -c p1.cif -wq -S
+   ln -s ../forcefield.lib .
+   ln -s ../cif2lammps .
    ./cif2lammps -c p1_topol.cif -wq -S
    go_raspa
   cd ..
@@ -364,7 +372,7 @@ cd ${main_folder}
   # RASPA MC simulation of a adsorption of Argon 
   guest='argon'
   let cycle++
-  n_beads=$(echo "scale=0; $Xe_density * ${volume_structure} * ${HVF} * ${N_Avogadro}/ ( ${Xe_m} * ${A32L})" | bc -lq)
+  n_beads=$(echo "scale=0; $ua * $ub * $uc * ${Ar_density} * ${volume_structure} * ${HVF} * ${N_Avogadro}/ ( ${Ar_m} * ${A32L})" | bc -lq)
   cycle_name=$(echo $cycle | awk '{ printf("%02d\n", $1) }')
   fill_with_guest
   previous_name=${CyclesNameFile}
