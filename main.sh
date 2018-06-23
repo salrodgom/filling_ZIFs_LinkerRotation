@@ -137,6 +137,22 @@ function fill_with_guest {
   esac
  fi
 }
+function elastic_constants {
+ update_name
+ folder=${CyclesNameFile}_elastic_constants
+ if [ ! -d $folder ] ; then
+  mkdir $folder
+  cd $folder
+   cp ../${CIFTemporallyFile} p1_topol.cif
+   cp ${raspa_files_folder}/*.def .
+   cp ${raspa_files_folder}/INPUT.elastic_constants simulation.input
+   cp ../cif2lammps .
+   cp ../forcefield.lib
+   ./cif2lammps -c p1_topol.cif -wq -S
+   go_raspa
+  cd ..
+ fi
+}
 function interface_adsorption_lammps {
  lammps_file_lib="in.lmp"
  cp ${lib_folder}/forcefield.lib .
@@ -320,6 +336,7 @@ cd ${main_folder}
  first_optimisation
  distance_angle_measure
  energy0=$(tail -n1 ${CyclesNameFile}_emmd/logs/minimization.txt | awk '{print $5}')
+ elastic_constants
  for i in $(seq 1 ${n_cycles}) ; do
   # 
   guest='argon'

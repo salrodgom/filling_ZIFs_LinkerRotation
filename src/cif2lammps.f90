@@ -7,7 +7,7 @@ program zif_cif2gin
  real                :: r = 1.0e12
 !parameters
  real,parameter      :: k_B = 8.617332478e-5
- real,parameter      :: r_min_criteria_connectivity=0.2
+ real,parameter      :: r_min_criteria_connectivity=0.15
  INTEGER, PARAMETER  :: muchisimo=100000
 ! variables
  integer             :: num_args
@@ -95,6 +95,7 @@ program zif_cif2gin
  logical                                      :: fill_with_Ar_flag    = .false.
  logical                                      :: adsorption_fast_atom_saturation_INPUT = .false.
  logical                                      :: input_from_RASPA =.false.
+ logical                                      :: flag_naming
  !
  num_args = command_argument_count()
  allocate(args(num_args))
@@ -244,17 +245,16 @@ program zif_cif2gin
         (atom(i)%element==30.and.atom(j)%element==1)).or.&
        ((atom(i)%element==6.and.atom(j)%element==30).or. &
         (atom(i)%element==30.and.atom(j)%element==6)).or.&
-       ((atom(i)%element==1.and.atom(j)%element==16).or. &
-       (atom(i)%element==16.and.atom(j)%element==1)).or. &
        ((atom(i)%element==8.and.atom(j)%element==30).or. &
        (atom(i)%element==30.and.atom(j)%element==8)).or. &
-       ((atom(i)%element==1.and.atom(j)%element==48).or. &
-        (atom(i)%element==48.and.atom(j)%element==1)).or.&
+       ((atom(i)%element==1.and.atom(j)%element==54).or. &
+        (atom(i)%element==54.and.atom(j)%element==1)).or.&
        ((atom(i)%element==6.and.atom(j)%element==48).or. &
         (atom(i)%element==48.and.atom(j)%element==6)).or.&
        ((atom(i)%element==8.and.atom(j)%element==48).or. &
        (atom(i)%element==48.and.atom(j)%element==8)).or. &
-       (atom(i)%label=="C3".and.atom(j)%label=="C3")) then
+        (atom(i)%element==1.and.atom(j)%element==1) &
+       )  then
      ConnectedAtoms(i,j)=.false.
      ConnectedAtoms(j,i)=.false.
      atom(i)%degree=atom(i)%degree-1
@@ -263,26 +263,17 @@ program zif_cif2gin
    end if
   end do
  end do
- call check_bonds_with_degree(8,2)
- call check_bonds_with_degree(6,4)
- call check_bonds_with_degree(16,3)
- call check_bonds_with_degree(1,1)
+ call check_bonds_with_degree(54,0) ! Xe
+ call check_bonds_with_degree(30,4) ! Zn
+ call check_bonds_with_degree(48,4) ! Cd
+ call check_bonds_with_degree(1,1)  ! H
+ call check_bonds_with_degree(8,2)  ! O
+ call check_bonds_with_degree(7,3)  ! N
 ! degree of each node:
  write(6,'(a)') 'Connectivity array for each atom:'
  write(6,'(1000(i2))')(atom(i)%degree,i=1,n_atoms)
 ! rename atoms with for certain forcefield
  if ( modify_topology_flag ) then
-! charge for topologies:
-!charge +0.6918  # Zn
-!charge +0.6918  # Cd
-!charge +0.2045  # C4
-!charge -0.3879  # N1
-!charge -0.0839  # C2
-!charge +0.1310  # H2
-!charge +0.0     # C5
-!charge -0.10745 # C6
-!charge +0.1310  # H1
-  ! {{
   scan_for_rename_first_phase: do i=1,n_atoms
    !first N and Zn:
    if( atom(i)%element==7 )then
@@ -299,10 +290,11 @@ program zif_cif2gin
     atom(i)%charge = +0.312
    end if
   end do scan_for_rename_first_phase
-
   scan_for_rename_carbon_atoms: do i=1,n_atoms
    !second, C-atoms:
    if( atom(i)%element==6 ) then
+    flag_naming=.true.
+    qwerty: do while ( flag_naming )
     h=0 ! N-counter
     l=0 ! C-counter
     k=0 ! S-counter
@@ -317,43 +309,49 @@ program zif_cif2gin
       if( atom(j)%element==1 ) hh=hh+1 ! H
      end if
     end do scan_for_N_C_S_atoms
-    if( h==1 .and. l==1 .and. k==0 .and. n==0 ) then
+    if( h==1 .and. l==1 .and. k==0 .and. n==0 .and. hh==1 ) then
      atom(i)%new_label = "C2  "
      atom(i)%charge = -0.0839
-    else if ( h==2 .and. l==0 .and. k==0 .and. n==0 ) then
+     flag_naming=.false.
+     write(6,*) atom(i)%new_label, 'found'
+    else if( h==2 .and. l==0 .and. k==0 .and. n==0 .and. hh==1 ) then
      atom(i)%new_label = "C4  "
-     atom(i)%charge =  +0.259300001
-    else if ( h==2 .and. l==1 .and. k==0 .and. n==0 ) then
+     atom(i)%charge= +0.259300001
+     flag_naming=.false.
+    else if( h==2 .and. l==1 .and. k==0 .and. n==0 .and. hh==0 )then
      atom(i)%new_label = "C1  "
      atom(i)%charge = +0.4291
-    else if ( h==0 .and. l==1 .and. k==0 .and. n==0 ) then
+     flag_naming=.false.
+    else if( h==0 .and. l==1 .and. k==0 .and. n==0 .and. hh==3 )then
      atom(i)%new_label = "C3  "
      atom(i)%charge = -0.4526
-    else if ( h==1 .and. l==2 .and. k==0 .and. n==0) then
+     flag_naming=.false.
+    else if ( h==1 .and. l==2 .and. k==0 .and. n==0 .and. hh==0 ) then
      atom(i)%new_label = "C5  "
      atom(i)%charge = +0.039
-    else if ( h==0 .and. l==2 .and. k==0 .and. n==0 ) then
+     flag_naming=.false.
+    else if ( h==0 .and. l==2 .and. k==0 .and. n==0 .and. hh==1 ) then
      atom(i)%new_label = "C6  "
      atom(i)%charge = -0.11785
-    else if ( k==1 .and. n==0 ) then
-     atom(i)%new_label = "C7  "
-     atom(i)%charge = -0.148
+     flag_naming=.false.
+    else if ( h==0 .and. l==2 .and. k==0 .and. n==0 .and. hh==2 ) then
+     atom(i)%new_label = "C8  "
+     atom(i)%charge = -0.2620
+     flag_naming=.false.
     else
      write(6,*)'============================================================'
      write(6,*)'unknow C-atom'
-     write(6,*)'C-S bonds detected:',k
      write(6,*)'C-N bonds detected:',h
      write(6,*)'C-C bonds detected:',l
      write(6,*)'C-H bonds detected:',hh
+     write(6,*)'C-O bonds detected:',n
+     write(6,*)'C-S bonds detected:',k
      write(6,*)'Degree:',  atom(i)%degree
-     do j=1,n_atoms
-      if( i/=j.and.ConnectedAtoms(i,j) )then
-       write(6,*)atom(i)%new_label,'(',atom(i)%label,')',atom(j)%new_label,'(',atom(j)%label,')'
-      end if
-     end do
+     call remove_bond_in_atom(i)
+     flag_naming=.true.
      write(6,*)'------------------------------------------------------------'
-     stop
     end if
+    end do qwerty
    end if
   end do scan_for_rename_carbon_atoms
 !water
@@ -400,9 +398,6 @@ program zif_cif2gin
       else if( atom(j)%new_label == "O1  " ) then
        atom(i)%new_label = "H4  "
        atom(i)%charge = +0.4238
-      else if( atom(j)%new_label == "C7  " ) then
-       atom(i)%new_label = "H5  "
-       atom(i)%charge = +0.090
       else
        write(6,*)'============================================================'
        write(6,*)'unknow H-atom'
@@ -410,16 +405,9 @@ program zif_cif2gin
        write(6,*)'Distance:',DistanceMatrix(i,j),ConnectedAtoms(i,j)
        write(6,*)'------------------------------------------------------------'
        do jj=1,n_atoms
-       !forall (h=1:3)
-       ! rouratom(h)=atom(i)%xyzs(h,1)
-       ! ratom(h)=atom(jj)%xyzs(h,1)
-       !end forall
-       !call make_distances(cell_0,ratom,rouratom,rv,r)
-       !DistanceMatrix(i,j)=r
        if(DistanceMatrix(i,jj)>0.1.and.DistanceMatrix(i,jj)<=2.0)then
         write(6,*)'Around:', atom(jj)%label,'(',atom(jj)%new_label,')',atom(jj)%degree
         write(6,*)'Distance:', DistanceMatrix(i,jj),ConnectedAtoms(i,jj)
-        !ConnectedAtoms(i,jj)
         write(6,*)'------------------------------------------------------------'
        end if
        end do
@@ -430,6 +418,43 @@ program zif_cif2gin
     end do
    end if
   end do scan_for_rename_H_atoms 
+  do i=1,n_atoms
+   if( atom(i)%element==6 .and. atom(i)%new_label=="C1  " ) then
+    do j=1,n_atoms
+     if( i/=j.and.ConnectedAtoms(i,j) )then
+      if( atom(j)%element==6 .and.atom(i)%new_label=="C8  " ) then
+       atom(i)%new_label="C7  "
+       atom(i)%charge=-0.3695
+      end if
+     end if
+    end do
+   end if
+  end do
+  do i=1,n_atoms
+   if( atom(i)%element==6 .and. atom(i)%new_label=="C3  " ) then
+    do j=1,n_atoms
+     if( i/=j.and.ConnectedAtoms(i,j) )then
+      if( atom(j)%element==6 .and.atom(i)%new_label=="C8  " ) then
+       atom(i)%new_label="C9  "
+       atom(i)%charge=-0.393 
+      end if
+     end if
+    end do
+   end if
+  end do
+  do i=1,n_atoms
+   if( atom(i)%element==1 .and. atom(i)%new_label=="H3  " ) then
+    do j=1,n_atoms
+     if( i/=j.and.ConnectedAtoms(i,j) )then
+      if( atom(j)%element==6 .and.atom(i)%new_label=="C9  " ) then
+       atom(i)%new_label="H4  "
+       atom(i)%charge=+0.1310 
+      end if
+     end if
+    end do
+   end if
+  end do
+!
   do i=1,n_atoms
    if(atom(i)%new_label/="Xxxx")then
     atom(i)%label=atom(i)%new_label
@@ -773,6 +798,41 @@ program zif_cif2gin
  deallocate(atom)
  stop 'Done'
  contains
+!
+ subroutine remove_bond_in_atom( III )
+  implicit none
+  integer,intent(in) :: III
+  integer            :: i,j,k
+  write(6,*)'=============================='
+  write(6,*)'Strange ',atom(III)%element,'-atom:',III,atom(III)%degree, atom(III)%label
+  allocate( check_topol_id(1:atom(III)%degree))
+  allocate( check_topol_distance(1:atom(III)%degree) )
+  j=0
+  do i=1,n_atoms
+   if(III/=i.and.ConnectedAtoms(III,i))then
+    j=j+1
+    check_topol_id(j)=i
+    check_topol_distance(j)=DistanceMatrix(III,i)
+    write(6,*)atom(i)%label,DistanceMatrix(III,i),j,atom(i)%degree
+   end if
+  end do
+  ghj: do i=1,atom(III)%degree
+   j=check_topol_id(i)
+   if( DistanceMatrix(III,j) == maxval( check_topol_distance ) ) then
+    ConnectedAtoms(III,j)=.false.
+    ConnectedAtoms(j,III)=.false.
+    atom(III)%degree=atom(III)%degree-1
+    atom(j)%degree=atom(j)%degree-1
+    write(6,*)'Solution:'
+    write(6,*)'remove bond:',III,j,atom(III)%label,atom(j)%label, DistanceMatrix(III,j), maxval( check_topol_distance )
+    exit ghj
+   end if
+  end do ghj
+  deallocate( check_topol_id )
+  deallocate( check_topol_distance )
+  return
+ end subroutine remove_bond_in_atom
+!
  subroutine check_bonds_with_degree(ZZZ,KKK)
  implicit none
  integer,intent(in) :: ZZZ,KKK
@@ -1023,7 +1083,6 @@ program zif_cif2gin
         select case(adjustl(trim(type_fff)))
         case("cvff")         ! p1*(1+p0*cos(p4*x))
          read(variables,*) p1,p0,p4
-         write(6,*)        p1,p0,p4
          select case(units)
           case('kcal/mol')
            p1=kcalmol2ev(p1) ! kcal/mol/rad/rad
