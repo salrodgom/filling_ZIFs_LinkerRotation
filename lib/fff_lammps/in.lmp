@@ -23,7 +23,7 @@ variable NumberOfNVEMDCycles equal 10000
 variable NumberOfNPTMDCycles equal 70000
 variable ndump               equal 100
 variable RandomSeed          equal RANDOMSEED
-variable Gnorm               equal 1e-6
+variable Gnorm               equal 1e-8
 # recenter and remove system drift 
 fix xxxxxxx  all recenter INIT INIT INIT
 # ------------------------ Optimisation Run -------------------------------
