@@ -43,13 +43,13 @@ variable            iter       loop 100000
  label              loop_min_1
  min_style          cg
  log                logs/log.opt
- minimize           1.0e-15 1.0e-15 10000 100000
+ minimize           1.0e-16 1.0e-16 100000 100000
  log logs/log.main append
  min_style          cg
  variable           AtomMinStep equal $(step)
  log logs/log.opt   append
  fix                opt_conp all box/relax tri 0.0 vmax 0.001
- minimize           1.0e-15 1.0e-15 10000 100000
+ minimize           1.0e-16 1.0e-16 100000 100000
  unfix              opt_conp
  log logs/log.main  append
  variable           CellMinStep equal $(step)-${AtomMinStep}
@@ -75,20 +75,18 @@ variable MacroStep loop 2
  reset_timestep 0
  change_box all x scale 1.15 y scale 1.15 z scale 1.15 remap
  velocity all create ${TK} ${RandomSeed}
- fix      2 all langevin ${TK} ${TK} ${tdamp} ${RandomSeed}
- fix      3 all nve
+ fix      2 all nvt temp ${TK} ${TK} ${tdamp}
  thermo   100
  log      logs/log.nvt
  run      ${NumberOfNVEMDCycles}
  log      logs/log.main append
  unfix    2
- unfix    3
- fix      4 all npt temp ${TK} ${TK} ${tdamp} tri ${Pbar} ${Pbar} ${tdamp}
+ fix      3 all npt temp ${TK} ${TK} ${tdamp} tri ${Pbar} ${Pbar} ${tdamp}
  thermo   100
  log      logs/log.npt
  run      ${NumberOfNPTMDCycles}
  log      logs/log.main append
- unfix    4
+ unfix    3
  undump   traj_all
  variable e equal pe
  print "# Final potential energy = $e"              append logs/minimization.txt screen no

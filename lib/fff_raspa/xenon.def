@@ -1,12 +1,12 @@
 # critical constants: Temperature [T], Pressure [Pa], and Acentric factor [-]
-154.58
-5043000.0
-0.0
+289.733
+5842000.0
+-0.39
 # Number Of Atoms
 1
-# Number of groups
+# Number Of Groups
 1
-# methane-group
+# Alkane-group
 flexible
 # number of atoms
 1

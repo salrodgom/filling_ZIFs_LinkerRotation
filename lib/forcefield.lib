@@ -186,11 +186,11 @@ C84  C84   lj/cut          0.294104    3.73    # WHCJ: 10.1039/c4ra00664j
 Ar   Ar    lj/cut          0.238066    3.41    # Tanaka et al. doi:10.1021/jp500931g
 O1   O1    lj/cut          0.1502629   3.1169  # Zhang et al., Fluid Phase Equilibria, 262 (2007) 210-216
 H4   H4    lj/cut          0.00774378  0.98    # idem
-O2   O2    lj/cut         0.120        3.03030303  # J. Phys. Chem. A, Vol. 106, No. 6, 2002
-S1   S1    lj/cut         0.350        3.565062389 # idem
-C7   C7    lj/cut         0.078        3.636363636 # idem
-H5   H5    lj/cut         0.024        2.3885918   # idem
-Xe   Xe    lj/cut          0.439169    4.1   # RASPA: GenericMOFs forcefield
+O2   O2    lj/cut          0.120       3.03030303  # J. Phys. Chem. A, Vol. 106, No. 6, 2002
+S1   S1    lj/cut          0.350       3.565062389 # idem
+C7   C7    lj/cut          0.078       3.636363636 # idem
+H5   H5    lj/cut          0.024       2.3885918   # idem
+Xe   Xe    lj/cut          0.439169362 4.1   # RASPA: GenericMOFs forcefield
 Kr   Kr    lj/cut          0.330669    3.636 # idem
 #
 End  

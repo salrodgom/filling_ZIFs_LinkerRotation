@@ -159,7 +159,7 @@ function elastic_constants {
 function CIF111toSupercell {
  update_name
  folder=${CyclesNameFile}_CheckSupercell_HVF
- if [ modify_supercell=="yes" ] ; then
+ if [ "${modify_supercell}" == "yes" ] ; then
   check_supercell
  else
   ua=1
@@ -169,26 +169,30 @@ function CIF111toSupercell {
  if [ ! -d $folder ] ; then
   mkdir $folder
   cd $folder
-   cp ../${raspa_files_folder}/*.def .
    cp ${raspa_files_folder}/*.def .
-   echo "SimulationType  MC
-NumberOfCycles               10000
-NumberOfInitializationCycles 0
-PrintEvery                   100
-ChargeMethod                 None
-Forcefield                   GenericMOFs
-Framework                    0
-FrameworkName    ${structure}_${seed}
-UnitCells        $ua $ub $uc
-Component 0 MoleculeName               helium
-            MoleculeDefinition         Local
-            FugacityCoefficient        1.0
-            WidomProbability           1.0
-            CreateNumberOfMolecules    0 " > simulation.input
+   cp ../${structure}_${seed}.cif    .
+   echo "SimulationType        MonteCarlo
+NumberOfCycles        10000
+PrintEvery            100
+PrintPropertiesEvery  100
+
+Forcefield            local
+ChargeMethod          None
+Framework             0
+FrameworkName         ${structure}_${seed}
+UnitCells             $ua $ub $uc
+ExternalTemperature   298.0
+
+Component 0 MoleculeName             helium
+            MoleculeDefinition       TraPPE
+            WidomProbability         1.0
+            CreateNumberOfMolecules  0" > simulation.input
    go_raspa
    mv Movies/System_0/Framework_0_final_${ua}_${ub}_${uc}_P1.cif ${CIFTemporallyFile}
    HVF=$(grep "Average Widom Rosenbluth-weight:" Output/System_0/output_*.data | awk '{print $5}')
    volume_structure=$(grep "Volume:" Output/System_0/output_*.data | tail -n2 | head -n1 | awk '{print $2}')
+   echo "Volume: $volume_structure"
+   echo "Helium Void Fraction: $HVF"
    sed -i '/^$/d' ${CIFTemporallyFile}
    cp ${CIFTemporallyFile} ../${CIFTemporallyFile}
   cd ..
