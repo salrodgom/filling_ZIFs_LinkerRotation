@@ -3,7 +3,7 @@
 # Variables
 CIFFile=$1
 nCPU=$2
-n_cycles=2
+n_cycles=1
 temperature=85.0
 pressure=0.0
 filling_mode="RASPA" # Rabdel_Code
@@ -352,7 +352,7 @@ function resumen {
 }
 ##############################################################
 # main program:
-for saturation_degre in 1.0 0.95 0.90 ; do
+for saturation_degre in 1.0 ; do
 main_folder=${structure}_${temperature}_${saturation_degre}_${seed}
 mkdir ${main_folder}
 cd ${main_folder}
@@ -365,7 +365,7 @@ cd ${main_folder}
  make_binaries
  guest='empty'
  first_optimisation
- distance_angle_measure
+ #distance_angle_measure
  energy0=$(tail -n1 ${CyclesNameFile}_emmd/logs/minimization.txt | awk '{print $5}')
  elastic_constants
  for i in $(seq 1 ${n_cycles}) ; do

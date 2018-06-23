@@ -294,7 +294,9 @@ program zif_cif2gin
    !second, C-atoms:
    if( atom(i)%element==6 ) then
     flag_naming=.true.
-    qwerty: do while ( flag_naming )
+    kk=0
+    qwerty: do while ( flag_naming .and. kk<= 10 )
+    kk=kk+1
     h=0 ! N-counter
     l=0 ! C-counter
     k=0 ! S-counter
