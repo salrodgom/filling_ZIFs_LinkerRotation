@@ -56,17 +56,22 @@ program pdb2cif
        forall ( j = 1:3 )
         average(j)=average(j)+xinbox(j,id(i))/real(n_atoms)
        end forall
+       write(6,*) label(id(i)), ( xinbox(j,id(i)) ,j=1,3)
+       forall ( j=1:3 )
+        xcryst(j,id(i)) =mod(vr(j,1)*xinbox(1,id(i))+vr(j,2)*xinbox(2,id(i))+vr(j,3)*xinbox(3,id(i))+100.0,1.0)
+       end forall
+       write(6,*) "    ", ( xcryst(j,id(i)) ,j=1,3)
  enddo read_coor_pdb
  read (100,'(a)') line
- coor_pdb: do i=1,n_atoms ! definimos las coordenadas cartesianas
-    forall ( j=1:3 )
-     xinbox(j,id(i)) = xinbox(j,id(i)) - average(j)
-    end forall
-    forall ( j=1:3 )
-     xcryst(j,id(i)) =mod(vr(j,1)*xinbox(1,id(i))+vr(j,2)*xinbox(2,id(i))+vr(j,3)*xinbox(3,id(i))+100.0,1.0)
-     !xcryst(j,id(i)) = vr(j,1)*xinbox(1,id(i))+vr(j,2)*xinbox(2,id(i))+vr(j,3)*xinbox(3,id(i))
-    end forall
- enddo coor_pdb
+ !coor_pdb: do i=1,n_atoms ! definimos las coordenadas cartesianas
+ !   forall ( j=1:3 )
+ !    xinbox(j,id(i)) = xinbox(j,id(i)) - average(j)
+ !   end forall
+ !   forall ( j=1:3 )
+ !    xcryst(j,id(i)) =mod(vr(j,1)*xinbox(1,id(i))+vr(j,2)*xinbox(2,id(i))+vr(j,3)*xinbox(3,id(i))+100.0,1.0)
+ !    !xcryst(j,id(i)) = vr(j,1)*xinbox(1,id(i))+vr(j,2)*xinbox(2,id(i))+vr(j,3)*xinbox(3,id(i))
+ !   end forall
+ !enddo coor_pdb
 ! escribo el cif
  call escritura_cif(xcryst,n_atoms,label,cell_0,rv)
  close(100)

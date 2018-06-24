@@ -10,6 +10,7 @@ filling_mode="RASPA" # Rabdel_Code
 CyclesEvery=5000
 modify_supercell="no"
 # parameters
+n_max_CPU=$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l)
 Xe_density=2942.0    # Xe, liquid phase [g/L]
 Ar_density=1395.4    # Ar, liquid phase [g/L]
 Xe_m=131.293         # Xe, mass         [g/mol]
@@ -159,8 +160,8 @@ function elastic_constants {
    cp ${raspa_files_folder}/INPUT.elastic_constants simulation.input
    ln -s ../forcefield.lib .
    ln -s ../cif2lammps .
-   ./cif2lammps -c p1_topol.cif -wq -S
-   go_raspa
+   ./cif2lammps -c p1.cif -wq -S
+   go_raspa_nohup
   cd ..
  fi
 }
@@ -271,16 +272,25 @@ function em_md_lammps {
 }
 function go_raspa {
  count_used_CPUs
- while [ $(echo "${n_used} >= ${nCPU}" | bc -l) == 1 ] ; do
+ while [ $(echo "${n_used} >= ${n_max_CPU}" | bc -l) == 1 ] ; do
   sleep 30
   count_used_CPUs
  done
  raspa
  sleep 1
 }
+function go_raspa_nohup {
+ count_used_CPUs
+ while [ $(echo "${n_used} >= ${n_max_CPU}" | bc -l) == 1 ] ; do
+  sleep 30
+  count_used_CPUs
+ done
+ raspa_nohup
+ sleep 1
+}
 function go_lammps {
  count_used_CPUs
- while [ $(echo "${n_used} >= ${nCPU}" | bc -l) == 1 ] ; do
+ while [ $(echo "${n_used} >= ${n_max_CPU}" | bc -l) == 1 ] ; do
   sleep 30
   count_used_CPUs
  done
@@ -305,22 +315,37 @@ function raspa {
  nohup simulate >> salida.raspa
  time >> salida.raspa
 }
+function raspa_nohup {
+ nohup simulate > salida.raspa &
+}
 function lammps_raspa {
  cp ../lammpstrj2pdb .
  cp ../pdb2cif .
- ./lammpstrj2pdb < movs/opti.lammpstrj
- n_lines=$(wc -l out.pdb |awk '{print $1}')
- line=$(sed -n '/MODEL/{=;p}' out.pdb | sed '{N;s/\n/ /}' | tail -n1 | awk '{print $1}')
- end=$((n_lines - line + 1))
- tail -n$end out.pdb > input.pdb
- # Remove guest!!!
+ ./lammpstrj2pdb < movs/opti.lammpstrj 
+ tac out.pdb | sed '/^MODEL /q' | tac > input.pdb
+# Remove guest!!!
  if [ "${remove_guest}" == "true" ] ; then
   sed -i '/ Ar /d' input.pdb
   sed -i '/ Xe /d' input.pdb
   sed -i '/ Kr /d' input.pdb
  fi
- #
  ./pdb2cif
+ #
+ #cp ../lammpstrj2pdb .
+ #cp ../pdb2cif .
+ ##./lammpstrj2pdb < movs/opti.lammpstrj
+ #n_lines=$(wc -l out.pdb |awk '{print $1}')
+ #line=$(sed -n '/MODEL/{=;p}' out.pdb | sed '{N;s/\n/ /}' | tail -n1 | awk '{print $1}')
+ #end=$((n_lines - line + 1))
+ #tail -n$end out.pdb > input.pdb
+ ## Remove guest!!!
+ #if [ "${remove_guest}" == "true" ] ; then
+ # sed -i '/ Ar /d' input.pdb
+ # sed -i '/ Xe /d' input.pdb
+ # sed -i '/ Kr /d' input.pdb
+ #fi
+ #
+ #./pdb2cif
  mv p1.cif ${CyclesNameFile}.cif
  cp ${CyclesNameFile}.cif ../${CIFTemporallyFile}
  cp ${CyclesNameFile}.cif ../${CyclesNameFile}.cif
@@ -368,6 +393,7 @@ cd ${main_folder}
  #distance_angle_measure
  energy0=$(tail -n1 ${CyclesNameFile}_emmd/logs/minimization.txt | awk '{print $5}')
  elastic_constants
+ exit 0
  for i in $(seq 1 ${n_cycles}) ; do
   # RASPA MC simulation of a adsorption of Argon 
   guest='argon'
@@ -388,7 +414,7 @@ cd ${main_folder}
   em_md_lammps
   energy=$(tail -n1 ${CyclesNameFile}_emmd/logs/minimization.txt | awk '{print $5}')
   statu=$(echo "scale=4; ($energy - $energy0)/(${n_Ar})" | bc -l)
-  distance_angle_measure
+  #distance_angle_measure
   elastic_constants
  done
  clean_binaries
