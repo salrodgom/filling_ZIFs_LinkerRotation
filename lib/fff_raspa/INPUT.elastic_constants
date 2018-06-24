@@ -17,7 +17,8 @@ MaximumStepLength       0.3
 
 Ensemble                NPTPR
 NPTPRCellType           RegularUpperTriangle
-ComputeElasticConstants yes
+ComputeElasticConstants           yes
+#ComputeElasticConstantsThirdOrder yes
 
 CutOff                  12.0
 ChargeMethod            Ewald
