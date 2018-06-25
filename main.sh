@@ -420,4 +420,5 @@ cd ${main_folder}
  clean_binaries
 cd ..
 done
+echo "Finish simulation."
 exit 0
