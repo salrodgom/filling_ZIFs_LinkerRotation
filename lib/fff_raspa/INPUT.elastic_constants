@@ -3,7 +3,7 @@ MinimizationMethod               Baker
 NumberOfCycles                   1
 NumberOfInitializationCycles     0
 NumberOfEquilibrationCycles      0
-MaximumNumberOfMinimizationSteps 500
+MaximumNumberOfMinimizationSteps 1000
 RemoveTranslationFromHessian     yes
 RemoveRotationFromHessian        yes
 PrintEvery                       1
