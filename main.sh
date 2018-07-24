@@ -8,7 +8,7 @@ temperature=85.0
 pressure=0.0
 filling_mode="RASPA" # Rabdel_Code
 CyclesEvery=5000
-modify_supercell="no"
+modify_supercell="yes"
 # parameters
 n_max_CPU=$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l)
 Xe_density=2942.0    # Xe, liquid phase [g/L]
@@ -393,12 +393,11 @@ cd ${main_folder}
  #distance_angle_measure
  energy0=$(tail -n1 ${CyclesNameFile}_emmd/logs/minimization.txt | awk '{print $5}')
  elastic_constants
- exit 0
  for i in $(seq 1 ${n_cycles}) ; do
   # RASPA MC simulation of a adsorption of Argon 
   guest='argon'
   let cycle++
-  n_beads=$(echo "scale=0; $ua * $ub * $uc * ${Ar_density} * ${volume_structure} * ${HVF} * ${N_Avogadro}/ ( ${Ar_m} * ${A32L})" | bc -lq)
+  n_beads=$(echo "scale=0; ${Ar_density} * ${volume_structure} * ${HVF} * ${N_Avogadro}/ ( ${Ar_m} * ${A32L})" | bc -lq)
   cycle_name=$(echo $cycle | awk '{ printf("%02d\n", $1) }')
   fill_with_guest
   previous_name=${CyclesNameFile}
@@ -420,4 +419,5 @@ cd ${main_folder}
  clean_binaries
 cd ..
 done
+echo "Finish simulation."
 exit 0
