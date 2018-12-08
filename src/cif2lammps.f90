@@ -1318,6 +1318,7 @@ program zif_cif2gin
   end do
   write(u,'(a)') "library GenericZIF"
   write(u,'(a)') "#switch_minimiser rfo gnorm 0.05"
+  write(u,'(a)') "stepmx opt 0.1" 
   write(u,'(a)') 'dump every 1 optimise.grs'
   close(u)
  end subroutine output_gulp
