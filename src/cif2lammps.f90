@@ -1304,7 +1304,7 @@ program zif_cif2gin
   GULPFilename=adjustl(GULPfilename)
   !adjustl(
   open(u,file=GULPFilename)
-  write(u,'(a)')'single conv'
+  write(u,'(a)')'single conp'
   write(u,'(A)')'cell'
   write(u,'(6(f9.5,1x))') (cell_0(j) , j=1,6)
   write(u,'(A)')'fractional'
@@ -1316,7 +1316,8 @@ program zif_cif2gin
    call checkatomtype_gulp(atom_types(i), atomtype_library)
    write(u,'(a4,1x,a4,1x,a6)') atom_types(i), "core", atomtype_library
   end do
-  write(u,'(a)') 'library GenericZIF'
+  write(u,'(a)') "library GenericZIF"
+  write(u,'(a)') "#switch_minimiser rfo gnorm 0.05"
   write(u,'(a)') 'dump every 1 optimise.grs'
   close(u)
  end subroutine output_gulp
