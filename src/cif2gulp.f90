@@ -37,7 +37,6 @@ program zif_cif2gin
   character(len=4) :: label
   character(len=4) :: new_label="Xxxx"
   character(len=6) :: label_from_CIFFile="Xxxxxx"
-  character(len=6) :: topol_label="Xxxx"
   integer          :: degree
   real             :: charge 
   real             :: radius
@@ -279,19 +278,15 @@ program zif_cif2gin
    !first N and Zn:
    if( atom(i)%element==7 )then
     atom(i)%new_label='N1  '
-    atom(i)%topol_label="N_R  " 
     atom(i)%charge = -0.3879
    else if( atom(i)%element==30) then
     atom(i)%new_label='Zn  '
-    atom(i)%topol_label="Zn    "
     atom(i)%charge = +0.6918
    else if( atom(i)%element==48) then
     atom(i)%new_label='Cd  '
-    atom(i)%topol_label="Cd    "
     atom(i)%charge = +0.6918
    else if( atom(i)%element==16) then
     atom(i)%new_label='S1  '
-    atom(i)%topol_label="S     "
     atom(i)%charge = +0.312
    end if
   end do scan_for_rename_first_phase
@@ -318,27 +313,22 @@ program zif_cif2gin
     end do scan_for_N_C_S_atoms
     if( h==1 .and. l==1 .and. k==0 .and. n==0 .and. hh==1 ) then
      atom(i)%new_label = "C2  "
-     atom(i)%topol_label = "C_R   "
      atom(i)%charge = -0.0839
      flag_naming=.false.
     else if( h==2 .and. l==0 .and. k==0 .and. n==0 .and. hh==1 ) then
      atom(i)%new_label = "C4  "
-     atom(i)%topol_label= "C_R2  "
      atom(i)%charge= +0.259300001
      flag_naming=.false.
     else if( h==2 .and. l==1 .and. k==0 .and. n==0 .and. hh==0 )then
      atom(i)%new_label = "C1  "
      atom(i)%charge = +0.4291
-     atom(i)%topol_label = "C_R2  "
      flag_naming=.false.
     else if( h==0 .and. l==1 .and. k==0 .and. n==0 .and. hh==3 )then
      atom(i)%new_label = "C3  "
-     atom(i)%topol_label = "C_33  "
      atom(i)%charge = -0.4526
      flag_naming=.false.
     else if ( h==1 .and. l==2 .and. k==0 .and. n==0 .and. hh==0 ) then
      atom(i)%new_label = "C5  "
-     atom(i)%topol_label = "C_R3  "
      atom(i)%charge = +0.039
      flag_naming=.false.
     else if ( h==0 .and. l==2 .and. k==0 .and. n==0 .and. hh==1 ) then
@@ -347,7 +337,6 @@ program zif_cif2gin
      flag_naming=.false.
     else if ( h==0 .and. l==2 .and. k==0 .and. n==0 .and. hh==2 ) then
      atom(i)%new_label = "C8  "
-     atom(i)%topol_label = "C_R3  "
      atom(i)%charge = -0.2620
      flag_naming=.false.
     else
@@ -393,7 +382,6 @@ program zif_cif2gin
  
   scan_for_rename_H_atoms: do i = 1,n_atoms
    if ( atom(i)%element == 1) then
-    atom(i)%topol_label = "H_   "
     do j=1,n_atoms
      if(j/=i.and.ConnectedAtoms(i,j))then
       if( atom(j)%new_label == "C2  " )      then
@@ -437,7 +425,6 @@ program zif_cif2gin
      if( i/=j.and.ConnectedAtoms(i,j) )then
       if( atom(j)%element==6 .and.atom(i)%new_label=="C8  " ) then
        atom(i)%new_label="C7  "
-       atom(i)%topol_label = "C_32  "
        atom(i)%charge=-0.3695
       end if
      end if
@@ -507,306 +494,11 @@ program zif_cif2gin
  write(987,'(100(a4,1x))') ( atom_types(i), i=1,n_atom_types)
  close(987)
  write(6,*)'=========='
-! bonds: 
- allocate(bond_type_string(bond_types_max))
- allocate(bond_type_histogram(bond_types_max))
- allocate(bond(n_bonds_max))
- bond_type_histogram=0
- bond_string(1:8)="        "
- do i=1,bond_types_max
-  do j=1,8 
-   write(bond_type_string(j:j),'(a1)')" "
-  end do 
- end do
- forall (i=1:n_bonds_max)
-  forall (j=1:80)
-   bond(i)(j:j)=" "
-  end forall
- end forall
- do_i: do i=1,n_atoms
-  do_j: do j=i+1,n_atoms
-   if(ConnectedAtoms(i,j))then
-    write(bond_string(1:8),'(2a4)') atom(i)%label(1:4),atom(j)%label(1:4)
-    forall (l=1:100)
-     line(l:l)=" "
-    end forall
-    if(n_bond_types==0)then
-     n_bonds=n_bonds+1
-     n_bond_types=n_bond_types+1
-     bond_type_string(1)=bond_string
-     bond_type_histogram(1)=1
-     write(bond(n_bonds)(1:21),'(3i7)')n_bond_types,i,j
-     write(bond(n_bonds)(22:24),'(a3)')' # '
-     write(bond(n_bonds)(25:),'(a)') bond_string
-     cycle do_j
-    else
-     n_bonds=n_bonds+1
-     n_bond_types=n_bond_types+1 ! try
-     check_bond: do h=n_bond_types-1,1,-1
-      if(bond_string(1:8)==bond_type_string(h)(1:8).or.&
-         bond_string(1:8)==bond_type_string(h)(5:8)//bond_type_string(h)(1:4))then
-       n_bond_types=n_bond_types-1
-       bond_type_histogram(h)=bond_type_histogram(h)+1
-       write(bond(n_bonds)(1:21),'(3i7)')h,i,j
-       write(bond(n_bonds)(22:24),'(a3)')' # '
-       write(bond(n_bonds)(25:),'(a)') bond_string
-       cycle do_j
-      end if
-     end do check_bond
-     bond_type_histogram(n_bond_types)=1
-     bond_type_string(n_bond_types)=bond_string
-     write(bond(n_bonds)(1:21),'(3i7)')n_bond_types,i,j
-     write(bond(n_bonds)(22:24),'(a3)')' # '
-     write(bond(n_bonds)(25:),'(a)') bond_string
-    end if
-   end if
-  end do do_j
- end do do_i
-! bends:
- allocate(bend_type_string(bend_types_max))
- allocate(bend_type_histogram(bend_types_max))
- allocate(bend(n_bends_max))
- bend_type_histogram=0
- bend_string(1:12)="            "
- do i=1,bend_types_max
-  do j=1,12
-   write(bend_type_string(j:j),'(a1)')" "
-  end do
- end do
- forall (i=1:n_bends_max)
-  forall (j=1:80)
-   bend(i)(j:j)=" "
-  end forall
- end forall
- do_i_bend: do i=1,n_atoms ! central atom
-  do_j_bend: do j=1,n_atoms
-   if(ConnectedAtoms(i,j).and.j/=i)then
-    do_k_bend: do k=1,n_atoms
-     if(ConnectedAtoms(i,k).and.k/=j.and.k/=i)then
-      write(bend_string(1:12),'(3a4)') atom(j)%label(1:4),atom(i)%label(1:4),atom(k)%label(1:4)
-      if(n_bend_types==0)then
-       n_bends=n_bends+1
-       n_bend_types=n_bend_types+1
-       bend_type_string(1)=bend_string
-       bend_type_histogram(1)=1
-       write(bend(n_bends)(1:28),'(4i7)')n_bend_types,j,i,k
-       write(bend(n_bends)(29:31),'(a3)')' # '
-       write(bend(n_bends)(32:),'(a)') bend_string
-       cycle do_k_bend
-      else
-       n_bends=n_bends+1
-       n_bend_types=n_bend_types+1 ! try
-       check_bend_type: do h=n_bend_types-1,1,-1
-        if(bend_string(1:12)==bend_type_string(h)(1:12).or.&
-           bend_string(1:12)==bend_type_string(h)(9:12)//bend_type_string(h)(5:8)//&
-           bend_type_string(h)(1:4))then
-         n_bend_types=n_bend_types-1
-         write(bend(n_bends)(1:28),'(4i7)')h,j,i,k
-         write(bend(n_bends)(29:31),'(a3)')' # '
-         write(bend(n_bends)(32:),'(a)') bend_string
-         check_bend: do l=1,n_bends-1
-          read(bend(l)(8:28),'(3i7)')jj,ii,kk
-          if((jj==j.and.ii==i.and.kk==k).or.&
-             (kk==j.and.ii==i.and.jj==k))then
-           n_bends=n_bends-1
-           cycle do_k_bend
-          end if
-         end do check_bend
-         bend_type_histogram(h)=bend_type_histogram(h)+1
-         cycle do_k_bend
-        end if
-       end do check_bend_type
-       bend_type_histogram(n_bend_types)=1
-       bend_type_string(n_bend_types)=bend_string
-       write(bend(n_bends)(1:28),'(4i7)')n_bend_types,j,i,k
-       write(bend(n_bends)(29:31),'(a3)')' # '
-       write(bend(n_bends)(32:),'(a)') bend_string
-      end if
-     end if
-    end do do_k_bend
-   end if
-  end do do_j_bend
- end do do_i_bend
-! dihedrals
- allocate(tors_type_string(tors_types_max))
- allocate(tors_type_histogram(tors_types_max))
- allocate(tors(n_torss_max))
- tors_type_histogram=0
- tors_string(1:16)="                "
- do i=1,tors_types_max
-  do j=1,16
-   write(tors_type_string(j:j),'(a1)')" "
-  end do
- end do
- forall (i=1:n_torss_max)
-  forall (j=1:80)
-   tors(i)(j:j)=" "
-  end forall
- end forall
- do_i_tors: do i=1,n_atoms
-  do_j_tors: do j=1,n_atoms
-   if(ConnectedAtoms(i,j).and.j/=i)then
-    do_k_tors: do k=1,n_atoms
-     if(ConnectedAtoms(j,k).and.k/=j.and.k/=i)then
-      do_l_tors: do l=1,n_atoms
-       if(ConnectedAtoms(k,l).and.l/=k.and.l/=j.and.l/=i)then
-        write(tors_string(1:16),'(4a4)')atom(i)%label(1:4),atom(j)%label(1:4),&
-                                        atom(k)%label(1:4),atom(l)%label(1:4)
-        if(n_tors_types==0)then
-         n_torss=n_torss+1
-         n_tors_types=n_tors_types+1
-         tors_type_string(1)=tors_string
-         tors_type_histogram(1)=1
-         write(tors(n_torss)(1:35),'(5i7)')n_tors_types,i,j,k,l
-         write(tors(n_torss)(36:38),'(a3)')' # '
-         write(tors(n_torss)(39:),'(a)') tors_string
-         cycle do_l_tors
-        else
-         n_torss=n_torss+1
-         n_tors_types=n_tors_types+1 ! try
-         check_tors_type: do h=n_tors_types-1,1,-1
-          if(tors_string(1:16)==tors_type_string(h)(1:16).or.&
-             tors_string(1:16)==tors_type_string(h)(13:16)//tors_type_string(h)(9:12)//&
-                                tors_type_string(h)(5:8)//tors_type_string(h)(1:4))then
-           n_tors_types=n_tors_types-1
-           write(tors(n_torss)(1:35),'(5i7)')h,i,j,k,l
-           write(tors(n_torss)(36:38),'(a3)')' # '
-           write(tors(n_torss)(39:),'(a)') tors_string
-           check_tors: do m=1,n_torss-1
-            read(tors(m)(8:35),'(4i7)')ii,jj,kk,ll
-            if((ii==i.and.jj==j.and.kk==k.and.ll==l).or.&
-               (ll==i.and.kk==j.and.jj==k.and.ii==l))then
-             n_torss=n_torss-1
-             cycle do_l_tors
-            end if
-           end do check_tors
-           tors_type_histogram(h)=tors_type_histogram(h)+1
-           cycle do_l_tors
-          end if
-         end do check_tors_type
-         tors_type_histogram(n_tors_types)=1
-         tors_type_string(n_tors_types)=tors_string
-         write(tors(n_torss)(1:35),'(5i7)') n_tors_types,i,j,k,l
-         write(tors(n_torss)(36:38),'(a3)')' # '
-         write(tors(n_torss)(39:),'(a)') tors_string
-        end if
-       end if
-      end do do_l_tors
-     end if
-    end do do_k_tors
-   end if
-  end do do_j_tors
- end do do_i_tors
-! impropers
- allocate(impr_type_string(impr_types_max))
- allocate(impr_type_histogram(impr_types_max))
- allocate(impr(n_imprs_max))
- impr_type_histogram=0
- impr_string(1:16)="                "
- do i=1,impr_types_max
-  do j=1,16
-   write(impr_type_string(j:j),'(a1)')" "
-  end do
- end do
- forall (i=1:n_imprs_max)
-  forall (j=1:80)
-   impr(i)(j:j)=" "
-  end forall
- end forall
- do_i_impr: do i=1,n_atoms
-  do_j_impr: do j=1,n_atoms
-   if(ConnectedAtoms(i,j).and.j/=i)then
-    do_k_impr: do k=1,n_atoms
-     if(ConnectedAtoms(i,k).and.k/=j.and.k/=i)then
-      do_l_impr: do l=1,n_atoms
-       if(ConnectedAtoms(i,l).and.l/=k.and.l/=j.and.l/=i)then
-        write(impr_string(1:16),'(4a4)')atom(i)%label(1:4),atom(j)%label(1:4),&
-                                        atom(k)%label(1:4),atom(l)%label(1:4)
-        if(n_impr_types==0)then
-         n_imprs=n_imprs+1
-         n_impr_types=n_impr_types+1
-         impr_type_string(1)=impr_string
-         impr_type_histogram(1)=1
-         write(impr(n_imprs)(1:35),'(5i7)')n_impr_types,i,j,k,l
-         write(impr(n_imprs)(36:38),'(a3)')' # '
-         write(impr(n_imprs)(39:),'(a)') impr_string
-         cycle do_l_impr
-        else
-         n_imprs=n_imprs+1
-         n_impr_types=n_impr_types+1 ! try
-         check_impr_type: do h=n_impr_types-1,1,-1
-          if(impr_string(1:16)==impr_type_string(h)(1:16).or.&
-             impr_string(1:16)==impr_type_string(h)(1:4)//impr_type_string(h)(9:12)//&
-                                impr_type_string(h)(5:8)//impr_type_string(h)(13:16).or.&
-             impr_string(1:16)==impr_type_string(h)(1:4)//impr_type_string(h)(5:8)//&
-                                impr_type_string(h)(13:16)//impr_type_string(h)(9:12).or.&
-             impr_string(1:16)==impr_type_string(h)(1:4)//impr_type_string(h)(13:16)//&
-                                impr_type_string(h)(9:12)//impr_type_string(h)(5:8) )then
-           n_impr_types=n_impr_types-1
-           write(impr(n_imprs)(1:35),'(5i7)')h,i,j,k,l
-           write(impr(n_imprs)(36:38),'(a3)')' # '
-           write(impr(n_imprs)(39:),'(a)') impr_string
-           check_impr: do m=1,n_imprs-1
-            read(impr(m)(8:35),'(4i7)')ii,jj,kk,ll
-            if((ii==i.and.jj==j.and.kk==k.and.ll==l).or.&
-               (ii==i.and.kk==j.and.jj==k.and.ll==l).or.&
-               (ii==i.and.jj==j.and.ll==k.and.kk==l).or.&
-               (ii==i.and.ll==j.and.jj==k.and.kk==l).or.&
-               (ii==i.and.kk==j.and.ll==k.and.jj==l).or.&
-               (ii==i.and.ll==j.and.kk==k.and.jj==l))then
-             n_imprs=n_imprs-1
-             cycle do_l_impr
-            end if
-           end do check_impr
-           impr_type_histogram(h)=impr_type_histogram(h)+1
-           cycle do_l_impr
-          end if
-         end do check_impr_type
-         impr_type_histogram(n_impr_types)=1
-         impr_type_string(n_impr_types)=impr_string
-         write(impr(n_imprs)(1:35),'(5i7)') n_impr_types,i,j,k,l
-         write(impr(n_imprs)(36:38),'(a3)')' # '
-         write(impr(n_imprs)(39:),'(a)') impr_string
-        end if
-       end if
-      end do do_l_impr
-     end if
-    end do do_k_impr
-   end if
-  end do do_j_impr
- end do do_i_impr
- write(6,*)'Bond types:',n_bond_types
- write(6,*)'bonds:',n_bonds
- do i=1,n_bond_types 
-  write(6,*) bond_type_string(i),bond_type_histogram(i)
- end do
- write(6,*)'Bend types:',n_bend_types
- write(6,*)'bends:',n_bends
- do i=1,n_bend_types 
-  write(6,*) bend_type_string(i),bend_type_histogram(i)
- end do
- write(6,*)'Dihedral types:',n_tors_types
- write(6,*)'dihedrals:',n_torss
- do i=1,n_tors_types
-  write(6,*) tors_type_string(i),tors_type_histogram(i)
- end do
- write(6,*)'Improper types:',n_impr_types
- write(6,*)'impropers:',n_imprs
- do i=1,n_impr_types
-  write(6,*) impr_type_string(i),impr_type_histogram(i)
- end do
-! output:
  call cellnormal2lammps(cell_0,xlo_bound,ylo_bound,zlo_bound,&
       xhi_bound,yhi_bound,zhi_bound,xy,xz,yz)
- call output_lammps()
  call output_gulp()
  call output_pdb()
  call output_CIF()
- deallocate(bend_type_string)
- deallocate(bend_type_histogram)
- deallocate(bend)
- deallocate(bond_type_string)
- deallocate(bond_type_histogram)
  deallocate(DistanceMatrix)
  deallocate(ConnectedAtoms)
  deallocate(atom)
@@ -1218,6 +910,7 @@ program zif_cif2gin
  subroutine output_gulp()
   implicit none
   character(len=100) :: GULPFilename
+  character(len=6)   :: atomtype_library
   integer           :: u=444
   integer           :: i
   real              :: mmm,rrr
@@ -1228,7 +921,7 @@ program zif_cif2gin
   GULPFilename=adjustl(GULPfilename)
   !adjustl(
   open(u,file=GULPFilename)
-  write(u,'(a)')'single conv molq qok noenergy'
+  write(u,'(a)')'single conv'
   write(u,'(A)')'cell'
   write(u,'(6(f9.5,1x))') (cell_0(j) , j=1,6)
   write(u,'(A)')'fractional'
@@ -1237,10 +930,12 @@ program zif_cif2gin
   end do
   write(u,'(A,1x,i5)')'species',n_atom_types
   do i=1,n_atom_types
-   write(u,'(a)')atom_types(i)
+   call checkatomtype_gulp(atom_types(i), atomtype_library)
+   write(u,'(a4,1x,a4,1x,a6)') atom_types(i), "core", atomtype_library
   end do
-  write(u,'(a,1x,a)')'output lammps ','test'
-  write(u,'(a,1x,a)')'output cif ','test'
+  write(u,'(a)') 'library GenericZIF'
+  write(u,'(a)') 'dump every 1 optimise.grs'
+  write(u,'(a,1x,a)')'output cif ','optimised'
   close(u)
  end subroutine output_gulp
  subroutine output_lammps()
@@ -1434,6 +1129,35 @@ program zif_cif2gin
   !zhi_bound = zhi 
   return
  end subroutine cellnormal2lammps
+ subroutine checkatomtype_gulp(label,newlabel)
+  implicit none
+  character(len=4),intent(in)  :: label
+  character(len=6),intent(out) :: newlabel
+  select case(label)
+   case("H1  ":"H999")
+    newlabel = "H_    "
+   case("Zn  ")
+    newlabel = "Zn    "
+   case("C1  ","C4  ")
+    newlabel = "C_R2  "
+   case("C2  ","C6  ")
+    newlabel = "C_R   "
+   case("C5  ")
+    newlabel = "C_R3  "
+   case("C3  ","C8  ")
+    newlabel = "C_3   "
+   case("C7  ")
+    newlabel = "C_32  "
+   case("N1  ")
+    newlabel = "N_R   "
+   case default
+    write(6,'(a1,a4,a1)')"'",label,"'"
+    write(6,'(a)')"Atom unknowed"
+    newlabel = label
+  end select 
+  return
+ end subroutine checkatomtype_gulp
+  
  subroutine checkatom(Label,m,s,Z,Zlabel)
   implicit none
   character(len=4),intent(in)  :: Label
