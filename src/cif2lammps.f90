@@ -1311,6 +1311,7 @@ program zif_cif2gin
   do i=1,n_atoms
    write(u,'(a4,1x,3(f14.7,1x),1x,f14.7)')atom(i)%label,(atom(i)%xyzs(j,1),j=1,3),atom(i)%charge
   end do
+   write(u,'(a,1x,i3)')'species',n_atom_types
   do i=1,n_atom_types
    call checkatomtype_gulp(atom_types(i), atomtype_library)
    write(u,'(a4,1x,a4,1x,a6)') atom_types(i), "core", atomtype_library
