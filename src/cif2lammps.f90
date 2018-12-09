@@ -217,7 +217,6 @@ program zif_cif2gin
   if(input_from_RASPA)then
    read(line,*,iostat=ierr)atom(i)%label_from_CIFFile, atom(i)%label, (atom(i)%xyzs(j,1),j=1,3), atom(i)%charge
   elseif(charges_flag) then
-   !read(line,*,iostat=ierr)atom(i)%label,(atom(i)%xyzs(j,1),j=1,3),atom(i)%charge
    read(line,*,iostat=ierr)atom(i)%label,(atom(i)%xyzs(j,1),j=1,3)
   else if(adsorption_fast_atom_saturation_INPUT) then
    read(line,*,iostat=ierr)atom(i)%label_from_CIFFile, atom(i)%label, (atom(i)%xyzs(j,1),j=1,3), atom(i)%charge
@@ -311,11 +310,13 @@ program zif_cif2gin
   select case(atom(i)%topol_label)
    ! code:
    !  element@C_H_O_N_P_S_Zn_Cd_He_Ar_Xe 
+   !
    ! Nitrogen:
    case("N@2_0_0_0_0_0_1_0_0_0_0_")
     atom(i)%new_label     = "N1  "
     atom(i)%charge        = -0.3879
     atom(i)%hybridization = "N_R"
+   !
    ! Carbons:
    case("C@1_0_0_2_0_0_0_0_0_0_0_")
     atom(i)%new_label     = "C1  "
@@ -356,6 +357,7 @@ program zif_cif2gin
     !
     ! C9 es pisado por C3
     !
+   !
    ! Metals:
    case("Zn@0_0_0_4_0_0_0_0_0_0_0_")
     atom(i)%new_label     = 'Zn  '
@@ -366,11 +368,21 @@ program zif_cif2gin
     atom(i)%new_label     = 'Cd  '
     atom(i)%charge        = +0.6918
     atom(i)%hybridization = "Cd"
+   !
+   ! Adsorbates:
+   case("Ar@0_0_0_0_0_0_0_0_0_0_0_")
+    atom(i)%new_label     = 'Ar  '
+    atom(i)%charge        = +0.0
+    atom(i)%hybridization = "Ar"
+   !
+   case("Xe@0_0_0_0_0_0_0_0_0_0_0_")
+    atom(i)%new_label     = 'Xe  '
+    atom(i)%charge        = +0.0
+    atom(i)%hybridization = "Xe"
     !
     ! C  H  O  N  P  S Zn Cd He Ar Xe ...
     ! 1  2  3  4  5  6  7  8  9 10 11 ...
     ! 6  1  8  7 15 16 30 48  2 18 54 ...
-   ! if ( TopologyMatrix(i,1) == 
    end select
   end do scan_for_label_1st_phase
   scan_for_label_2nd_phase: do i=1,n_atoms
@@ -398,126 +410,28 @@ program zif_cif2gin
      end do
     !
     !case("H@1_0_0_0_0_0_0_0_0_0_0_") ! hidrogenos
-    ! do j=1,n_atoms
- !   
    end select
   end do scan_for_label_2nd_phase
-!
   !
-  !scan_for_rename_carbon_atoms: do i=1,n_atoms
-  ! !second, C-atoms:
-  ! if( atom(i)%element==6 ) then
-  !  flag_naming=.true.
-  !  kk=0
-  !  qwerty: do while ( flag_naming .and. kk<= 10 )
-  !  kk=kk+1
-  !  h=0 ! N-counter
-  !  l=0 ! C-counter
-  !  k=0 ! S-counter
-  !  n=0 ! O-counter
-  !  hh=0 ! H-counter
-  !  scan_for_N_C_S_atoms: do j=1,n_atoms
-  !   if( i/=j.and.ConnectedAtoms(i,j) )then
-  !    if( atom(j)%element==7 ) h=h+1   ! N 
-  !    if( atom(j)%element==6 ) l=l+1   ! C
-  !    if( atom(j)%element==16) k=k+1   ! S
-  !    if( atom(j)%element==8 ) n=n+1   ! O
-  !    if( atom(j)%element==1 ) hh=hh+1 ! H
-  !   end if
-  !  end do scan_for_N_C_S_atoms
-  !  if( h==1 .and. l==1 .and. k==0 .and. n==0 .and. hh==1 ) then
-  !   atom(i)%new_label = "C2  "
-  !   atom(i)%topol_label = "C_R   "
-  !   atom(i)%charge = -0.0839
-  !   flag_naming=.false.
-  !  else if( h==2 .and. l==0 .and. k==0 .and. n==0 .and. hh==1 ) then
-  !   atom(i)%new_label = "C4  "
-  !   atom(i)%topol_label= "C_R2  "
-  !   atom(i)%charge= +0.259300001
-  !   flag_naming=.false.
-  !  else if( h==2 .and. l==1 .and. k==0 .and. n==0 .and. hh==0 )then
-  !   atom(i)%new_label = "C1  "
-  !   atom(i)%charge = +0.4291
-  !   atom(i)%topol_label = "C_R2  "
-  !   flag_naming=.false.
-  !  else if( h==0 .and. l==1 .and. k==0 .and. n==0 .and. hh==3 )then
-  !   atom(i)%new_label = "C3  "
-  !   atom(i)%topol_label = "C_33  "
-  !   atom(i)%charge = -0.4526
-  !   flag_naming=.false.
-  !  else if ( h==1 .and. l==2 .and. k==0 .and. n==0 .and. hh==0 ) then
-  !   atom(i)%new_label = "C5  "
-  !   atom(i)%topol_label = "C_R3  "
-  !   atom(i)%charge = +0.039
-  !   flag_naming=.false.
-  !  else if ( h==0 .and. l==2 .and. k==0 .and. n==0 .and. hh==1 ) then
-  !   atom(i)%new_label = "C6  "
-  !   atom(i)%charge = -0.11785
-  !   flag_naming=.false.
-  !  else if ( h==0 .and. l==2 .and. k==0 .and. n==0 .and. hh==2 ) then
-  !   atom(i)%new_label = "C8  "
-  !   atom(i)%topol_label = "C_R3  "
-  !   atom(i)%charge = -0.2620
-  !   flag_naming=.false.
-  !  else
-  !   write(6,*)'============================================================'
-  !   write(6,*)'unknow C-atom'
-  !   write(6,*)'C-N bonds detected:',h
-  !   write(6,*)'C-C bonds detected:',l
-  !   write(6,*)'C-H bonds detected:',hh
-  !   write(6,*)'C-O bonds detected:',n
-  !   write(6,*)'C-S bonds detected:',k
-  !   write(6,*)'Degree:',  atom(i)%degree
-  !   call remove_bond_in_atom(i)
-  !   flag_naming=.true.
-  !   write(6,*)'------------------------------------------------------------'
-  !  end if
-  !  end do qwerty
-  ! end if
-  !end do scan_for_rename_carbon_atoms
-!water
-  !scan_for_rename_O_atoms: do i = 1,n_atoms
-  ! k=0 ! S-counter
-  ! scan_for_S_atoms: do j=1,n_atoms
-  !  if( i/=j.and.ConnectedAtoms(i,j).and.atom(j)%element==16 ) k=k+1
-  ! end do scan_for_S_atoms
-  ! if ( atom(i)%element == 8 ) then
-  !  if( k==0) then
-  !  atom(i)%new_label = "O1  "
-  !  atom(i)%charge = -0.8476
-  !  else if ( k==1 ) then
-  !  atom(i)%new_label = "O2  "
-  !  atom(i)%charge = -0.556
-  !  else
-  !     write(6,*)'============================================================'
-  !     write(6,*)'unknow O-atom'
-  !     write(6,*)'O-S bonds detected:',k
-  !     write(6,*)'Bond:', atom(j)%label,'(',atom(j)%new_label,')',atom(j)%degree
-  !     write(6,*)'Distance:',DistanceMatrix(i,j),ConnectedAtoms(i,j)
-  !     write(6,*)'------------------------------------------------------------'
-  !     stop
-  !  end if
-  ! end if
-  !end do scan_for_rename_O_atoms 
   scan_for_rename_H_atoms: do i = 1,n_atoms
    if ( atom(i)%element == 1) then
     atom(i)%topol_label = "H_   "
     do j=1,n_atoms
      if(j/=i.and.ConnectedAtoms(i,j))then
       if( atom(j)%new_label == "C2  " )      then
-       atom(i)%new_label = "H2  "
+       atom(i)%new_label = "H2 "
        atom(i)%charge = +0.1128
       else if( atom(j)%new_label == "C4  " ) then
-       atom(i)%new_label = "H2  "
+       atom(i)%new_label = "H2 "
        atom(i)%charge = +0.1128
       else if( atom(j)%new_label == "C3  " ) then
-       atom(i)%new_label = "H3  "
+       atom(i)%new_label = "H3 "
        atom(i)%charge = +0.131866667
       else if( atom(j)%new_label == "C6  " ) then
-       atom(i)%new_label = "H1  "
+       atom(i)%new_label = "H1 "
        atom(i)%charge = +0.1128
       else if( atom(j)%new_label == "O1  " ) then
-       atom(i)%new_label = "H4  "
+       atom(i)%new_label = "H4 "
        atom(i)%charge = +0.4238
       else
        write(6,*)'============================================================'
@@ -1170,6 +1084,14 @@ program zif_cif2gin
        read(passing,'(a,a)')type_fff,variables
        if(adjustl(trim(type_fff))/='none')then
         select case(adjustl(trim(type_fff)))
+        case("cossq")        ! 0.5*p1*cos(x-p2)^2
+         read(variables,*) p1,p2
+         select case(units)
+          case('kcal/mol')
+           p1=kcalmol2ev(p1) ! kcal/mol/rad/rad
+           p2=p2             ! [-]
+         end select
+         write(string,*) p1,p2,' # ',type_fff
         case("cvff")         ! p1*(1+p0*cos(p4*x))
          read(variables,*) p1,p0,p4
          select case(units)
@@ -1314,7 +1236,12 @@ program zif_cif2gin
    write(u,'(a,1x,i3)')'species',n_atom_types
   do i=1,n_atom_types
    call checkatomtype_gulp(atom_types(i), atomtype_library)
-   write(u,'(a4,1x,a4,1x,a6)') atom_types(i), "core", atomtype_library
+   select case(atom_types(i))
+    case("H0  ":"H999")
+     write(u,'(a4,1x,a4,1x,a6)') "H_  ", "core", atomtype_library
+    case default
+     write(u,'(a4,1x,a4,1x,a6)') atom_types(i), "core", atomtype_library
+   end select
   end do
   write(u,'(a)') "library GenericZIF"
   write(u,'(a)') "#switch_minimiser rfo gnorm 0.05"

@@ -32,34 +32,33 @@ cova Xe    0.0
 end
 
 harmonic bond kcal
-Zn   core N_R  core    86.000   1.987
-C_R  core C_R  core   518.000   1.346
-C_R  core H_   core   367.000   0.929
-C_R  core N_R  core   410.000   1.371
-C_R2 core N_R  core   488.000   1.339
-C_R2 core C_3  core   317.000   1.492
-C_R2 core H_   core   367.000   0.929
-C_3  core H_   core   340.000   0.959
-
-three-body bond kcal
-C_R2 core N_R  core N_R  core  70.000  112.17
-C_R2 core N_R  core H_   core  70.000  123.89
-C_R2 core N_R  core C_3  core  70.000  123.89
-C_3  core C_R2 core H_   core  50.000  109.44
-C_3  core C_3  core C_R2 core  50.000  109.44
-C_R  core C_R  core N_R  core  70.000  108.67
-C_R  core C_R  core H_   core  50.000  125.67
-C_R  core H_   core N_R  core  50.000  125.66
-N_R  core C_R  core C_R2 core  70.000  105.24
-N_R  core C_R2 core Zn   core  50.000  127.50
-N_R  core C_R  core Zn   core  35.000  128.00
-Zn   core N_R  core N_R  core  10.500  109.47
-C_3  core H_   core H_   core  35.000  109.50
+Zn   core N_R  core   172.0    1.987
+C_R  core C_R  core  1036.0    1.346
+C_R  core H_   core   734.0    0.929
+C_R  core N_R  core   820.0    1.371
+C_R2 core N_R  core   976.0    1.339
+C_R2 core C_3  core   634.0    1.492
+C_R2 core H_   core   734.0    0.929
+C_3  core H_   core   680.0    0.959
+                                                   
+three-body bond kcal 
+C_R2 core N_R  core N_R  core  140.000  112.17 
+C_R2 core N_R  core H_   core  140.000  123.89 
+C_R2 core N_R  core C_3  core  140.000  123.89 
+C_3  core C_R2 core H_   core  100.000  109.44 
+C_R  core C_R  core N_R  core  140.000  108.67 
+C_R  core C_R  core H_   core  100.000  125.67 
+C_R  core H_   core N_R  core  100.000  125.66 
+N_R  core C_R  core C_R2 core  140.000  105.24 
+N_R  core C_R2 core Zn   core  100.000  127.50
+N_R  core C_R  core Zn   core  70.000   128.00
+Zn   core N_R  core N_R  core  21.500   109.47  
+C_3  core H_   core H_   core  70.000   109.50  
 #
 torsion bond kcal
 C_R  core N_R core C_R2 core N_R core 4.800 +2 180.0
 C_R  core N_R core C_R2 core C_3 core 4.150 +2 180.0
-C_R  core N_R core C_R2 core H_  core 4.150 +2 180.0
+C_R  core N_R core C_R2 core H_  core 4.800 +2 180.0
 C_R2 core N_R core C_R  core C_R core 4.800 +2 180.0
 C_R2 core N_R core C_R  core H_  core 4.800 +2 180.0
 N_R  core C_R core C_R  core N_R core 4.0   +2 180.0
