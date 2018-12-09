@@ -99,15 +99,18 @@ program zif_cif2gin
  logical                                      :: input_from_RASPA =.false.
  logical                                      :: flag_naming
  logical                                      :: flag_lammps = .false.
- ! Element table:
+ ! Element table and Matrix Topology:
  integer,allocatable  :: TopologyMatrix(:,:)
+ integer,parameter    :: max_number_of_elements = 11
+ integer              :: element_table(1:max_number_of_elements)
  ! C  H  O  N  P  S Zn Cd He Ar Xe ...
  ! 1  2  3  4  5  6  7  8  9 10 11 ...
- ! 6  1  8  7 15 16 30 48  2 18 54 ... 
- integer              :: element_table(11)
-!
+ ! 6  1  8  7 15 16 30 48  2 18 54 ...
+!C                      H                      O                      N
  element_table(1) = 6 ; element_table(2) = 1 ; element_table(3) = 8 ; element_table(4) = 7
+!P                      S                      Zn                     Cd
  element_table(5) =15 ; element_table(6) =16 ; element_table(7) =30 ; element_table(8) =48
+!He                     Ar                     Xe
  element_table(9) = 2 ; element_table(10)=18 ; element_table(11)=54 
  !
  num_args = command_argument_count()
@@ -685,6 +688,7 @@ program zif_cif2gin
   end do do_j_tors
  end do do_i_tors
 ! impropers
+! =========
  allocate(impr_type_string(impr_types_max))
  allocate(impr_type_histogram(impr_types_max))
  allocate(impr(n_imprs_max))
@@ -700,6 +704,11 @@ program zif_cif2gin
    impr(i)(j:j)=" "
   end forall
  end forall
+!   l
+!  .|.
+!   i - j 
+!   |
+!   k
  do_i_impr: do i=1,n_atoms
   do_j_impr: do j=1,n_atoms
    if(ConnectedAtoms(i,j).and.j/=i)then
