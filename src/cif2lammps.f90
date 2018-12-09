@@ -1110,7 +1110,7 @@ program zif_cif2gin
          stop
         end select
        else
-        write(string,*) 0.0,1,0,' # ',type_fff
+        write(string,*) 0.0,0.0,' # ',type_fff
        end if
        exit fff
       end if
