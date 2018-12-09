@@ -35,9 +35,10 @@ variable           min_eval_MacroCycle equal 0.1
 run                0
 variable           prev_E     equal $(pe)
 variable           prev_E_MacroCycle equal $(pe)
-print "# First Optimisation"                             file logs/minimization.txt screen no
-print "# initial energy: ${prev_E}"                    append logs/minimization.txt screen no
+print "# First Optimisation"                              file   logs/minimization.txt screen no
+print "# initial energy: ${prev_E}"                       append logs/minimization.txt screen no
 print "# Interation AtomMinStep CellMinStep Energy EDiff" append logs/minimization.txt screen no
+print "0.1 0 0 ${prev_E} 0.0"                             append logs/minimization.txt screen no
 variable            iter       loop 100000
  thermo             10
  thermo_style       one
