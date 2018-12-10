@@ -9,12 +9,13 @@ box tilt large
 bond_style                   harmonic
 angle_style                  harmonic
 dihedral_style               fourier
-improper_style               cvff
+improper_style               cossq
 pair_style                   lj/cut/coul/long 14.0
-kspace_style                 ewald 1e-8
 read_data                    FILENAME.data
+kspace_style                 pppm 1e-4
 pair_modify                  mix arithmetic shift yes tail no table 0
-special_bonds                lj 0.0 0.0  0.00000 coul 0.0 0.0  0.00000
+special_bonds                lj/coul 0.0 0.0 1.0
+dielectric                   1.0
 variable TK                  equal TEMPERATURE
 variable Pbar                equal 0.0
 variable dt                  equal 0.0005
@@ -24,8 +25,6 @@ variable NumberOfNPTMDCycles equal 70000
 variable ndump               equal 100
 variable RandomSeed          equal RANDOMSEED
 variable Gnorm               equal 1e-9
-# recenter and remove system drift 
-fix xxxxxxx  all recenter INIT INIT INIT
 # ------------------------ Optimisation Run -------------------------------
 dump        traj_opti all custom ${ndump} movs/opti.lammpstrj element xs ys zs
 dump_modify traj_opti element ELEMENTS   first yes sort id
@@ -37,6 +36,7 @@ variable           prev_E_MacroCycle equal $(pe)
 print "# First Optimisation"                             file logs/minimization.txt screen no
 print "# initial energy: ${prev_E}"                    append logs/minimization.txt screen no
 print "# Interation AtomMinStep CellMinStep Energy EDiff" append logs/minimization.txt screen no
+print "0.1 0 0 ${prev_E} 0.0"                             append logs/minimization.txt screen no
 variable            iter       loop 100000
  thermo             10
  thermo_style       one
