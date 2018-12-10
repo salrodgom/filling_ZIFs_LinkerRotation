@@ -75,7 +75,7 @@ function check_supercell {
  echo "==========================================================="
 }
 function makeCIFTopology {
- ./cif2lammps -c ${CIFTemporallyFile} -wq -S
+ ./cif2lammps -c ${CIFTemporallyFile} -wq -S -l
  mv ${structure}_${seed}_topol.cif ${CIFTemporallyFile}
  rm ${structure}_${seed}.gin ${structure}_${seed}.pdb ${structure}_${seed}.data
 }
@@ -160,7 +160,7 @@ function elastic_constants {
    cp ${raspa_files_folder}/INPUT.elastic_constants simulation.input
    ln -s ../forcefield.lib .
    ln -s ../cif2lammps .
-   ./cif2lammps -c p1.cif -wq -S
+   ./cif2lammps -c p1.cif -wq -S -l
    go_raspa_nohup
   cd ..
  fi
@@ -237,14 +237,14 @@ function interface_adsorption_lammps {
    flags="-wq -S"
   ;;
  esac 
- ./cif2lammps -c ${CyclesNameFile}.cif ${flags}
+ ./cif2lammps -c ${CyclesNameFile}.cif ${flags} -l
 }
 function first_optimisation {
  update_name
  CIF111toSupercell
  cp ${CIFTemporallyFile} ${CyclesNameFile}.cif
- ./cif2lammps -c ${CyclesNameFile}.cif -R -S 
- lammps_file_lib="in.lmp.initialitation"
+ ./cif2lammps -c ${CyclesNameFile}.cif -R -S -l
+ lammps_file_lib="in.lmp"
  em_md_lammps
 }
 function em_md_lammps {
@@ -321,7 +321,7 @@ function raspa_nohup {
 function lammps_raspa {
  cp ../lammpstrj2pdb .
  cp ../pdb2cif .
- ./lammpstrj2pdb < movs/opti.lammpstrj 
+ ./lammpstrj2pdb < movs/global_minimum.lammpstrj
  tac out.pdb | sed '/^MODEL /q' | tac > input.pdb
 # Remove guest!!!
  if [ "${remove_guest}" == "true" ] ; then
@@ -330,22 +330,6 @@ function lammps_raspa {
   sed -i '/ Kr /d' input.pdb
  fi
  ./pdb2cif
- #
- #cp ../lammpstrj2pdb .
- #cp ../pdb2cif .
- ##./lammpstrj2pdb < movs/opti.lammpstrj
- #n_lines=$(wc -l out.pdb |awk '{print $1}')
- #line=$(sed -n '/MODEL/{=;p}' out.pdb | sed '{N;s/\n/ /}' | tail -n1 | awk '{print $1}')
- #end=$((n_lines - line + 1))
- #tail -n$end out.pdb > input.pdb
- ## Remove guest!!!
- #if [ "${remove_guest}" == "true" ] ; then
- # sed -i '/ Ar /d' input.pdb
- # sed -i '/ Xe /d' input.pdb
- # sed -i '/ Kr /d' input.pdb
- #fi
- #
- #./pdb2cif
  mv p1.cif ${CyclesNameFile}.cif
  cp ${CyclesNameFile}.cif ../${CIFTemporallyFile}
  cp ${CyclesNameFile}.cif ../${CyclesNameFile}.cif
@@ -414,8 +398,14 @@ cd ${main_folder}
   energy=$(tail -n1 ${CyclesNameFile}_emmd/logs/minimization.txt | awk '{print $5}')
   statu=$(echo "scale=4; ($energy - $energy0)/(${n_Ar})" | bc -l)
   #distance_angle_measure
-  elastic_constants
+  #elastic_constants
  done
+ remove_guest="true"
+ flags_cif2lammps="post-Xe-Ar-exchange"
+ guest="empty"
+ cycle_name="99"
+ update_name
+ em_md_lammps
  clean_binaries
 cd ..
 done

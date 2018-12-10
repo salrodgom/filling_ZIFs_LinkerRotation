@@ -12,7 +12,7 @@ dihedral_style               fourier
 improper_style               cossq
 pair_style                   lj/cut/coul/long 14.0
 read_data                    FILENAME.data
-kspace_style                 pppm 1e-4
+kspace_style                 pppm 1e-6
 pair_modify                  mix arithmetic shift yes tail no table 0
 special_bonds                lj/coul 0.0 0.0 1.0
 dielectric                   1.0
@@ -25,16 +25,19 @@ variable NumberOfNPTMDCycles equal 70000
 variable ndump               equal 100
 variable RandomSeed          equal RANDOMSEED
 variable Gnorm               equal 1e-10
+variable GnormMacro          equal 1e-10
+variable global_min_energy   equal 999999999.99999999
 # ------------------------ Optimisation Run -------------------------------
 dump        traj_opti all custom ${ndump} movs/opti.lammpstrj element xs ys zs
-dump_modify traj_opti element ELEMENTS   first yes sort id
+dump_modify traj_opti element ELEMENTS first yes sort id
 variable           min_eval            equal ${Gnorm}
 variable           min_eval_MacroCycle equal 0.1
 run                0
-variable           prev_E     equal $(pe)
+variable           prev_E            equal $(pe)
 variable           prev_E_MacroCycle equal $(pe)
-print "# First Optimisation"                             file logs/minimization.txt screen no
-print "# initial energy: ${prev_E}"                    append logs/minimization.txt screen no
+variable           global_min_energy equal $(pe)
+print "# First Optimisation"                              file   logs/minimization.txt screen no
+print "# initial energy: ${prev_E}"                       append logs/minimization.txt screen no
 print "# Interation AtomMinStep CellMinStep Energy EDiff" append logs/minimization.txt screen no
 print "0.1 0 0 ${prev_E} 0.0"                             append logs/minimization.txt screen no
 variable            iter       loop 100000
@@ -42,16 +45,12 @@ variable            iter       loop 100000
  thermo_style       one
  label              loop_min_1
  min_style          cg
- log                logs/log.opt
  minimize           1.0e-16 1.0e-16 100000 100000
- log logs/log.main append
  min_style          cg
  variable           AtomMinStep equal $(step)
- log logs/log.opt   append
  fix                opt_conp all box/relax tri 0.0 vmax 0.001
  minimize           1.0e-16 1.0e-16 100000 100000
  unfix              opt_conp
- log logs/log.main  append
  variable           CellMinStep equal $(step)-${AtomMinStep}
  variable           tmppe       equal $(pe)
  variable           min_E       equal abs(${prev_E}-$(pe))
@@ -66,30 +65,27 @@ variable            iter       loop 100000
 label       break_min_1
 undump      traj_opti
 label loop_MacroCycle
-variable MacroStep loop 2
+variable           prev_E_MacroCycle equal ${tmppe}
+variable MacroStep loop 10
  # ------------------------ Equilibration Run -------------------------------
  print "#" append logs/minimization.txt screen no
  print "# Molecular Dynamics [${MacroStep}]" append logs/minimization.txt screen no
  dump        traj_all   all       custom ${ndump} movs/all.lammpstrj       element xs ys zs
- dump_modify traj_all   element ELEMENTS  first yes sort id
+ dump_modify traj_all   element ELEMENTS first yes sort id
  reset_timestep 0
  change_box all x scale 1.15 y scale 1.15 z scale 1.15 remap
  velocity all create ${TK} ${RandomSeed}
  fix      2 all nvt temp ${TK} ${TK} ${tdamp}
  fix   xxxxxxx  all recenter INIT INIT INIT
  thermo   100
- log      logs/log.nvt
  run      ${NumberOfNVEMDCycles}
  unfix xxxxxxx
- log      logs/log.main append
  unfix    2
  fix      3 all npt temp ${TK} ${TK} ${tdamp} tri ${Pbar} ${Pbar} ${tdamp}
  fix   xxxxxxx  all recenter INIT INIT INIT
  thermo   100
- log      logs/log.npt
  run      ${NumberOfNPTMDCycles}
  unfix xxxxxxx
- log      logs/log.main append
  unfix    3
  undump   traj_all
  variable e equal pe
@@ -97,27 +93,22 @@ variable MacroStep loop 2
  # Optimisation again:
  reset_timestep 0
  dump        traj_opti all custom ${ndump} movs/opti.lammpstrj element xs ys zs
- dump_modify traj_opti element ELEMENTS   first yes sort id append yes
+ dump_modify traj_opti element ELEMENTS first yes sort id append yes
  print "#" append logs/minimization.txt screen no
  print "# Post-Molecular-Dynamics Optimisation" append logs/minimization.txt screen no
  print "# Interation AtomMinStep AtomMinStep Energy EDiff" append logs/minimization.txt screen no
- #print "# MinStep CellMinStep AtomMinStep panem p equal $(step)
  variable           prev_E     equal 50000.00
  variable           iter       loop 100000
   thermo             100
   thermo_style       one
   label              loop_min_2
   min_style          cg
-  log                logs/log.opt append
   minimize           1.0e-15 1.0e-15 10000 100000
-  log                logs/log.main append
   min_style          cg
   variable           AtomMinStep equal $(step)
-  log                logs/log.opt   append
   fix                opt_conp all box/relax tri 0.0 vmax 0.001
   minimize           1.0e-15 1.0e-15 10000 100000
   unfix              opt_conp
-  log                logs/log.main append
   variable           CellMinStep equal $(step)-${AtomMinStep}
   variable           min_E       equal abs(${prev_E}-$(pe))
   variable           tmppe       equal $(pe)
@@ -131,11 +122,21 @@ variable MacroStep loop 2
  jump        SELF loop_min_2
  label       break_min_2
  undump      traj_opti
- variable    min_E_MacroCycle equal ${prev_E_MacroCycle}-${tmppe}
- variable    min_E_MacroCycle_abs equal abs(${min_E_MacroCycle})
+ variable    min_E_MacroCycle equal ${prev_E_MacroCycle}-${tmppe} # Gnorm
+ variable    min_E_MacroCycle_abs equal abs(${min_E_MacroCycle})  # abs(Gnorm)
+# Dump last snapshot of the minimum energy structure:
+ if "${global_min_energy} > ${tmppe}" then &
+  "variable global_min_energy equal ${tmppe}" &
+  "dump global_minimum_photo all custom 1 movs/global_minimum.lammpstrj element xs ys zs" &
+  "dump_modify    global_minimum_photo element ELEMENTS first yes sort id" &
+  "run 0" &
+  "undump         global_minimum_photo" &
+ else &
+  "print 'Simulation is stucked in a local minima'"
+#
  print "# "  append logs/minimization.txt screen no
  print "# Final potential energy = ${tmppe} eV, Gnorm = ${min_E_MacroCycle} eV" append logs/minimization.txt screen no
- if "${min_E_MacroCycle_abs} < ${min_eval_MacroCycle}" then "jump SELF break_MacroCycle"
+ if "${min_E_MacroCycle_abs} < ${GnormMacro}" then "jump SELF break_MacroCycle"
  variable prev_E_MacroCycle equal ${tmppe}
  next MacroStep
  jump SELF loop_MacroCycle
