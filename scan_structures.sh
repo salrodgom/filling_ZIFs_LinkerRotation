@@ -8,7 +8,7 @@ for CIFFile in $(ls -rS struc/*.cif) ; do
    echo "${main_folder} does not exits"
    echo "[in] analysis"
    mv struc/$file .
-   bash main.sh $file $nCPUs > salida.${structure}.txt
+   time bash main.sh $file $nCPUs > salida.${structure}.txt
    mv $file struc/dones
    echo "[out] analysis"
   else
