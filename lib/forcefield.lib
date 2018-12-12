@@ -44,7 +44,7 @@ C5   N1   C4   harmonic   70.0  105.24
 H1   C6   C5   harmonic   50.0  120.0 
 #
 Dihedral Coeffs   kcal/mol
-#
+#  1.7901529636711282
 C2   N1   C1   N1   fourier        1    4.800     2    180.0
 C5   N1   C4   N1   fourier        1    4.800     2    180.0
 C2   N1   C4   N1   fourier        1    4.800     2    180.0
@@ -79,11 +79,13 @@ C5   C6   C6   C5   fourier        1    4.0       2    180.0
 C6   C6   C6   C6   fourier        1    4.0       2    180.0
 C6   C5   C5   C6   fourier        1    4.0       2    180.0
 C6   C6   C6   H1   fourier        1    4.0       2    180.0
-#
+# Tanaka modifications:
 Zn   N1   C1   N1   fourier        1    0.1       2    180.0
 Zn   N1   C4   N1   fourier        1    0.1       2    180.0
 Zn   N1   C1   C3   fourier        1    0.1       2    180.0
 Zn   N1   C2   C2   fourier        1    0.1       2    180.0
+Zn   N1   C2   H2   fourier        1    0.1       2    180.0
+Zn   N1   C4   H2   fourier        1    0.1       2    180.0
 #
 Zn   N1   C5   C5   fourier        1    0.1       2    180.0
 Zn   N1   C5   C6   fourier        1    0.1       2    180.0
@@ -95,9 +97,7 @@ N1   Zn   N1   C4   fourier        1    0.174     3      0.0
 #
 N1   Zn   N1   C5   fourier        1    0.174     3      0.0
 #
-Zn   N1   C2   H2   none
 N1   C1   C3   H3   none
-Zn   N1   C4   H2   none
 #    
 Improper Coeffs   kcal/mol
 C1   C3   N1   N1      cossq     4.400  0.785398
