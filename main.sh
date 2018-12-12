@@ -1,37 +1,44 @@
 #!/bin/bash
 # Salvador Rodriguez Gomez, 2018/06
+#                   update, 2018/12
 # Variables
 CIFFile=$1
 nCPU=$2
-n_cycles=1
-temperature=85.0
-pressure=0.0
-filling_mode="RASPA" # Rabdel_Code
-CyclesEvery=5000
-modify_supercell="yes"
-# parameters
-n_max_CPU=$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l)
-Xe_density=2942.0    # Xe, liquid phase [g/L]
-Ar_density=1395.4    # Ar, liquid phase [g/L]
-Xe_m=131.293         # Xe, mass         [g/mol]
-Ar_m=39.948          # Ar, mass         [g/mol]
-N_Avogadro="6.0221415*10^(23)"
-A32L="1*10^(27)"
-InitCycles=$(echo "$CyclesEvery * 0.1" | bc -l | sed 's/\./ /g' | awk '{print $1}')
-MoviesEvery=$((CyclesEvery - 1))
-structure=$(echo $CIFFile | sed 's/\.cif//g')
-seed=$(od --read-bytes=3 --address-radix=n --format=uL /dev/urandom | tr --delete " ")
-while [ $(echo "$seed > 900000000" | bc -l) == 1 ] || [ $(echo "$seed < 0" | bc -l) == 1 ] ; do
+# Functions:
+function get_seed {
  seed=$(od --read-bytes=3 --address-radix=n --format=uL /dev/urandom | tr --delete " ")
- sleep 0.5
-done
-CIFTemporallyFile=${structure}_${seed}.cif
-# Files:
-loc=$(pwd)
-raspa_files_folder=$loc/lib/fff_raspa
-lammps_files_folder=$loc/lib/fff_lammps
-lib_folder=$loc/lib
-src_files_folder=$loc/src
+ while [ $(echo "$seed > 900000000" | bc -l) == 1 ] || [ $(echo "$seed < 0" | bc -l) == 1 ] ; do
+  seed=$(od --read-bytes=3 --address-radix=n --format=uL /dev/urandom | tr --delete " ")
+  sleep 0.1
+ done
+}
+function init_variables {
+ n_cycles=1
+ temperature=85.0
+ pressure=0.0
+ filling_mode="RASPA" # Rabdel_Code
+ CyclesEvery=5000
+ modify_supercell="yes"
+ # parameters
+ n_max_CPU=$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l)
+ Xe_density=2942.0    # Xe, liquid phase [g/L]
+ Ar_density=1395.4    # Ar, liquid phase [g/L]
+ Xe_m=131.293         # Xe, mass         [g/mol]
+ Ar_m=39.948          # Ar, mass         [g/mol]
+ N_Avogadro="6.0221415*10^(23)"
+ A32L="1*10^(27)"
+ InitCycles=$(echo "$CyclesEvery * 0.1" | bc -l | sed 's/\./ /g' | awk '{print $1}')
+ MoviesEvery=$((CyclesEvery - 1))
+ structure=$(echo $CIFFile | sed 's/\.cif//g')
+ get_seed
+ CIFTemporallyFile=${structure}_${seed}.cif
+ # Files:
+ loc=$(pwd)
+ raspa_files_folder=$loc/lib/fff_raspa
+ lammps_files_folder=$loc/lib/fff_lammps
+ lib_folder=$loc/lib
+ src_files_folder=$loc/src
+}
 ##############################################################
 # Functions:
 function make_binaries {
@@ -361,7 +368,8 @@ function resumen {
 }
 ##############################################################
 # main program:
-for saturation_degre in 1.00 ; do
+init_variables
+for saturation_degre in 1.50 ; do
 main_folder=${structure}_${temperature}_${saturation_degre}_${seed}
 mkdir ${main_folder}
 cd ${main_folder}
@@ -381,15 +389,15 @@ cd ${main_folder}
   # RASPA MC simulation of a adsorption of Argon 
   guest='argon'
   let cycle++
-  n_beads=$(echo "scale=0; ${Ar_density} * ${volume_structure} * ${HVF} * ${N_Avogadro}/ ( ${Ar_m} * ${A32L})" | bc -lq)
+  n_beads=$(echo "scale=0; ${saturation_degre} * ${Ar_density} * ${volume_structure} * ${HVF} * ${N_Avogadro}/ ( ${Ar_m} * ${A32L})" | bc -lq)
   cycle_name=$(echo $cycle | awk '{ printf("%02d\n", $1) }')
   fill_with_guest
   previous_name=${CyclesNameFile}
   # Change Argon by Xenon atoms:
-  guest='xenon'
+  #guest='xenon'
   cycle_name=$(echo $cycle | awk '{ printf("%02d\n", $1) }')
   update_name
-  sed "s/Ar /Xe /g" ${previous_name}.cif > ${CyclesNameFile}.cif
+  #sed "s/Ar /Xe /g" ${previous_name}.cif > ${CyclesNameFile}.cif
   # Run a Optimisation / Molecular Dynamics
   remove_guest="false"
   flags_cif2lammps="post-Xe-Ar-exchange"
@@ -405,6 +413,7 @@ cd ${main_folder}
  guest="empty"
  cycle_name="99"
  update_name
+ cp ${CIFTemporallyFile} ${CyclesNameFile}.cif
  em_md_lammps
  clean_binaries
 cd ..
