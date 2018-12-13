@@ -16,8 +16,8 @@ C7             lennard-jones    47.8562   3.47299
 C8             lennard-jones    47.8562   3.47299
 C9             lennard-jones    33.56496  3.431
 H_             lennard-jones    14.03991  2.571
-Zn_            lennard-jones    39.60363  2.462
-Cd_            lennard-jones   114.72388  2.537
+Zn             lennard-jones    39.60363  2.462
+Cd             lennard-jones   114.72388  2.537
 He             lennard-jones    10.9      2.64
 Ar             lennard-jones    119.8     3.34
 Kr             lennard-jones    166.4     3.636

@@ -31,10 +31,6 @@ C2   C2   H2   harmonic   50.0  125.67
 H2   C2   N1   harmonic   50.0  125.66
 C2   N1   C1   harmonic   70.0  105.24
 C2   N1   C4   harmonic   70.0  105.24
-C1   N1   Zn   harmonic   50.0  127.50 # 128.40 # Tanaka et al.
-C4   N1   Zn   harmonic   50.0  127.50 # 128.40 # Tanaka et al.
-C2   N1   Zn   harmonic   35.0  128.00 # 126.70 # Tanaka et al.
-C5   N1   Zn   harmonic   35.0  128.00 # 126.70 # Tanaka et al.
 N1   Zn   N1   harmonic   10.5  109.47
 H3   C3   H3   harmonic   35.0  109.50
 C5   C5   C6   harmonic   50.0  120.0
@@ -42,6 +38,11 @@ C5   C6   C6   harmonic   50.0  120.0
 C6   C6   C6   harmonic   50.0  120.0
 C5   N1   C4   harmonic   70.0  105.24
 H1   C6   C5   harmonic   50.0  120.0 
+# Tanaka modifications:changes in the equilibrium angles
+C1   N1   Zn   harmonic   50.0  128.40 # Tanaka et al.
+C4   N1   Zn   harmonic   50.0  128.40 # Tanaka et al.
+C2   N1   Zn   harmonic   35.0  126.70 # Tanaka et al.
+C5   N1   Zn   harmonic   35.0  126.70 # Tanaka et al.
 #
 Dihedral Coeffs   kcal/mol
 #  1.7901529636711282
@@ -50,9 +51,7 @@ C5   N1   C4   N1   fourier        1    4.800     2    180.0
 C2   N1   C4   N1   fourier        1    4.800     2    180.0
 C2   N1   C1   C3   fourier        1    4.150     2    180.0
 C2   N1   C4   H2   fourier        1    4.800     2    180.0
-#
 C5   N1   C4   H2   fourier        1    4.800     2    180.0
-#
 C1   N1   C2   C2   fourier        1    4.800     2    180.0
 C4   N1   C2   C2   fourier        1    4.800     2    180.0
 C4   N1   C5   C5   fourier        1    4.800     2    180.0
@@ -60,17 +59,14 @@ C4   N1   C5   C6   fourier        1    4.800     2    180.0
 C1   N1   C2   H2   fourier        1    4.800     2    180.0
 C4   N1   C2   H2   fourier        1    4.800     2    180.0
 N1   C2   C2   N1   fourier        1    4         2    180.0
-#
 N1   C5   C5   N1   fourier        1    4         2    180.0
 N1   C5   C5   N1   fourier        1    4         2    180.0
 N1   C5   C6   C6   fourier        1    4         2    180.0
 N1   C5   C5   C6   fourier        1    4         2    180.0
-#
 N1   C2   C2   H2   fourier        1    4         2    180.0
 N1   C5   C6   H1   fourier        1    4         2    180.0
 H2   C2   C2   H2   fourier        1    4         2    180.0
 H1   C6   C6   H1   fourier        1    4         2    180.0
-#
 C5   C5   C6   C6   fourier        1    4.0       2    180.0
 C5   C5   C6   H1   fourier        1    4.0       2    180.0
 C5   C6   C6   H1   fourier        1    4.0       2    180.0
@@ -79,24 +75,21 @@ C5   C6   C6   C5   fourier        1    4.0       2    180.0
 C6   C6   C6   C6   fourier        1    4.0       2    180.0
 C6   C5   C5   C6   fourier        1    4.0       2    180.0
 C6   C6   C6   H1   fourier        1    4.0       2    180.0
-# Tanaka modifications:
-Zn   N1   C1   N1   fourier        1    0.1       2    180.0
-Zn   N1   C4   N1   fourier        1    0.1       2    180.0
-Zn   N1   C1   C3   fourier        1    0.1       2    180.0
-Zn   N1   C2   C2   fourier        1    0.1       2    180.0
-Zn   N1   C2   H2   fourier        1    0.1       2    180.0
-Zn   N1   C4   H2   fourier        1    0.1       2    180.0
-#
-Zn   N1   C5   C5   fourier        1    0.1       2    180.0
-Zn   N1   C5   C6   fourier        1    0.1       2    180.0
-#
 N1   Zn   N1   C1   fourier        1    0.174     3      0.0
 N1   Zn   N1   C2   fourier        1    0.174     3      0.0
 N1   Zn   N1   C3   fourier        1    0.174     3      0.0
 N1   Zn   N1   C4   fourier        1    0.174     3      0.0
-#
 N1   Zn   N1   C5   fourier        1    0.174     3      0.0
-#
+# Tanaka modifications (force constant 7.49 kJ/mol):
+Zn   N1   C1   N1   fourier        1    1.79015   2    181.6
+Zn   N1   C4   N1   fourier        1    1.79015   2    181.6
+Zn   N1   C1   C3   fourier        1    1.79015   2    181.6
+Zn   N1   C2   C2   fourier        1    1.79015   2    181.6
+Zn   N1   C2   H2   fourier        1    1.79015   2    181.6
+Zn   N1   C4   H2   fourier        1    1.79015   2    181.6
+Zn   N1   C5   C5   fourier        1    1.79015   2    181.6
+Zn   N1   C5   C6   fourier        1    1.79015   2    181.6
+# none
 N1   C1   C3   H3   none
 #    
 Improper Coeffs   kcal/mol
@@ -108,7 +101,7 @@ C4   N1   N1   H2      cossq     4.400  0.785398
 C2   N1   C2   H2      none
 C3   C1   H3   H3      none
 C3   H3   H3   H3      none
-N1   C2   C1   Zn      none
+C2   Zn   N1   C1      cossq     4.400  0.785398
 N1   C1   Zn   C2      none
 N1   Zn   C2   C1      none
 Zn   N1   N1   N1      none
