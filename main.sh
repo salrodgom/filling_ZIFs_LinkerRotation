@@ -369,7 +369,7 @@ function resumen {
 ##############################################################
 # main program:
 init_variables
-for saturation_degre in 1.45 ; do
+for saturation_degre in 1.30 ; do
 main_folder=${structure}_${temperature}_${saturation_degre}_${seed}
 mkdir ${main_folder}
 cd ${main_folder}
