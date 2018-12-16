@@ -1,5 +1,5 @@
 #!/bin/bash
-nCPUs=20
+nCPUs=26
 for CIFFile in $(ls -rS struc/*.cif) ; do
   structure=$(echo $CIFFile | sed 's/\.cif//g' | sed 's/struc\///g')
   file=$(echo $CIFFile | sed 's/struc\///g')
