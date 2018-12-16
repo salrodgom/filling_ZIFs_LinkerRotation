@@ -3,7 +3,7 @@ shifted
 # general rule tailcorrections
 no
 # number of defined interactions
-17
+18
 # type interaction, parameters.    IMPORTANT: define shortest matches first, so that more specific ones overwrites these
 N1             lennard-jones    22.04116  3.261
 C1             lennard-jones    33.56496  3.431
@@ -11,11 +11,12 @@ C2             lennard-jones    33.56496  3.431
 C3             lennard-jones    33.56496  3.431
 C4             lennard-jones    33.56496  3.431
 C5             lennard-jones    30.70     3.60
-C6             lennard-jones    30.70     3.60
+C5             lennard-jones    30.70     3.60
+H1             lennard-jones    25.45     2.36
 C7             lennard-jones    47.8562   3.47299
 C8             lennard-jones    47.8562   3.47299
 C9             lennard-jones    33.56496  3.431
-H_             lennard-jones    14.03991  2.571
+H2             lennard-jones    14.03991  2.571
 Zn             lennard-jones    39.60363  2.462
 Cd             lennard-jones   114.72388  2.537
 He             lennard-jones    10.9      2.64

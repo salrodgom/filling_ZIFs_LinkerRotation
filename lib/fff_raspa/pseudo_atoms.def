@@ -9,7 +9,7 @@ C5         yes     C5    C     0           12.0107    +0.0390   0.0          1.0
 C6         yes     C6    C     0           12.0107    -0.11785  0.0          1.0       0.68  0            0           relative           0
 H1         yes     H2    H     0           1.00794    +0.1128   0.0          1.0       0.23  0            0           relative           0
 H2         yes     H2    H     0           1.00794    +0.1128   0.0          1.0       0.23  0            0           relative           0
-H3         yes     H3    H     0           1.00794    +0.131866667 0.0          1.0       0.23  0            0           relative           0
+H3         yes     H3    H     0           1.00794    +0.131866667 0.0       1.0       0.23  0            0           relative           0
 N1         yes     N1    N     0           14.00674   -0.3879   0.0          1.0       0.7   0            0           relative           0
 Zn         yes     Zn    Zn    0           65.37      +0.6918   0.0          1.0       1.45  0            0           relative           0
 He         yes     He    He    0           4.002602    0.0      0.0          1.0       1.0   0            0           relative           0
