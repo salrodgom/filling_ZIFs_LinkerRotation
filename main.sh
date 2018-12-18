@@ -414,7 +414,10 @@ cd ${main_folder}
  cycle_name="99"
  update_name
  cp ${CIFTemporallyFile} ${CyclesNameFile}.cif
- makeCIFTopology
+ sed "/Ar /d" ${CyclesNameFile}.cif | sed "/Xe /d" > c
+ mv c ${CyclesNameFile}.cif
+ ./cif2lammps -c ${CIFTemporallyFile} -wq -S -l
+ mv ${structure}_${seed}_topol.cif ${CIFTemporallyFile}
  em_md_lammps
  clean_binaries
 cd ..
