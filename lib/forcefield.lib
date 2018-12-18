@@ -121,6 +121,8 @@ C6   C6   C6   H1      none
 #
 Pair Coeffs      kcal/mol
 #
+#C_             lennard-jones    47.8562   3.47299
+#H_             lennard-jones     7.64893  2.84642
 #C_benz         lennard-jones    30.70     3.60
 #H_benz         lennard-jones    25.45     2.36
 #
@@ -130,10 +132,10 @@ C1   C1    lj/cut          0.0667      3.431
 C2   C2    lj/cut          0.0667      3.431
 C3   C3    lj/cut          0.0667      3.431
 C4   C4    lj/cut          0.0667      3.431
-C5   C5    lj/cut          0.0610067   3.600 # 0.0667      3.431 
-C6   C6    lj/cut          0.0610067   3.600 # 0.0667      3.431
+C5   C5    lj/cut          0.061006784 3.600 # 0.0667      3.431 
+C6   C6    lj/cut          0.061006784 3.600 # 0.0667      3.431
 H2   H2    lj/cut          0.0279      2.571
-H1   H1    lj/cut          0.0505740   2.36  # 0.0279      2.571
+H1   H1    lj/cut          0.050574024 2.36  # 0.0279      2.571
 H3   H3    lj/cut          0.0279      2.571
 Ar   Ar    lj/cut          0.238066    3.41  # Tanaka et al. doi:10.1021/jp500931g
 Xe   Xe    lj/cut          0.439169362 4.1   # RASPA: GenericMOFs forcefield

@@ -394,10 +394,10 @@ cd ${main_folder}
   fill_with_guest
   previous_name=${CyclesNameFile}
   # Change Argon by Xenon atoms:
-  #guest='xenon'
+  guest='xenon'
   cycle_name=$(echo $cycle | awk '{ printf("%02d\n", $1) }')
   update_name
-  #sed "s/Ar /Xe /g" ${previous_name}.cif > ${CyclesNameFile}.cif
+  sed "s/Ar /Xe /g" ${previous_name}.cif > ${CyclesNameFile}.cif
   # Run a Optimisation / Molecular Dynamics
   remove_guest="false"
   flags_cif2lammps="post-Xe-Ar-exchange"

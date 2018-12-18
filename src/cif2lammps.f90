@@ -348,7 +348,7 @@ program zif_cif2gin
     !
    case("C@2_1_0_0_0_0_0_0_0_0_0_")
     atom(i)%new_label     = "C6  "
-    atom(i)%charge        = -0.11785
+    atom(i)%charge        = -0.09785
     atom(i)%hybridization = "C_R_0"
     !
     ! C7 es pisado por C1
@@ -432,7 +432,7 @@ program zif_cif2gin
        atom(i)%charge = +0.131866667
       else if( atom(j)%new_label == "C6  " ) then
        atom(i)%new_label = "H1 "
-       atom(i)%charge = +0.1128
+       atom(i)%charge = +0.0928
       else if( atom(j)%new_label == "O1  " ) then
        atom(i)%new_label = "H4 "
        atom(i)%charge = +0.4238
