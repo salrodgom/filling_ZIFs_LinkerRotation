@@ -40,14 +40,14 @@ program zif_cif2gin
   character(len=50) :: topol_label="Xxxx"
   character(len=10) :: hybridization="Unknown"
   integer          :: degree
-  real             :: charge 
+  real             :: charge
   real             :: radius
   real             :: mass
   integer          :: n_components
   character(5)     :: clabel(max_n_componets)
   real             :: xyzs(1:3,max_n_componets)
   real             :: xyzc(1:3,max_n_componets)
- end type 
+ end type
  ! allocatable
  type(node),allocatable,dimension(:) :: atom
  type(node),allocatable,dimension(:) :: guest_atom
@@ -60,7 +60,6 @@ program zif_cif2gin
  character(len=8)                             :: bond_string
  integer                                      :: n_bond_types = 0
  character(len=80),dimension(:), allocatable  :: bond
- !character(len=8),dimension(:), allocatable   :: bond_type
  integer                                      :: n_bonds = 0
  integer                                      :: n_bonds_max = 100000
 ! bends
@@ -69,7 +68,6 @@ program zif_cif2gin
  character(len=12)                            :: bend_string
  integer                                      :: n_bend_types = 0
  character(len=80),dimension(:), allocatable  :: bend
- !character(len=20),dimension(:), allocatable  :: bend_type
  integer                                      :: n_bends = 0
  integer                                      :: n_bends_max = 100000
 ! torsion (dihedrals)
@@ -78,7 +76,6 @@ program zif_cif2gin
  character(len=16)                            :: tors_string
  integer                                      :: n_tors_types = 0
  character(len=80),dimension(:), allocatable  :: tors
- !character(len=25),dimension(:), allocatable  :: tors_type
  integer                                      :: n_torss = 0
  integer                                      :: n_torss_max = 100000
 ! torsion (impropers)
@@ -87,7 +84,6 @@ program zif_cif2gin
  character(len=16)                            :: impr_string
  integer                                      :: n_impr_types = 0
  character(len=80),dimension(:), allocatable  :: impr
- !character(len=25),dimension(:), allocatable  :: impr_type
  integer                                      :: n_imprs = 0
  integer                                      :: n_imprs_max = 100000
 ! arguments in line
@@ -111,7 +107,7 @@ program zif_cif2gin
 !P                      S                      Zn                     Cd
  element_table(5) =15 ; element_table(6) =16 ; element_table(7) =30 ; element_table(8) =48
 !He                     Ar                     Xe
- element_table(9) = 2 ; element_table(10)=18 ; element_table(11)=54 
+ element_table(9) = 2 ; element_table(10)=18 ; element_table(11)=54
  !
  num_args = command_argument_count()
  allocate(args(num_args))
@@ -206,7 +202,7 @@ program zif_cif2gin
   if(ierr/=0) exit
   if(line(1:)==string_stop_head) exit
  end do
- forall (i=1:n_atom_types_max) 
+ forall (i=1:n_atom_types_max)
   forall (j=1:4)
    atom_types(i)(j:j)=" "
   end forall
@@ -240,7 +236,7 @@ program zif_cif2gin
  ConnectedAtoms=.false.
  do i=1,n_atoms
   k=0
-  do j=1,n_atoms 
+  do j=1,n_atoms
    forall (h=1:3)
     rouratom(h)=atom(i)%xyzs(h,1)
     ratom(h)=atom(j)%xyzs(h,1)
@@ -312,7 +308,7 @@ program zif_cif2gin
   scan_for_label_1st_phase: do i=1,n_atoms
   select case(atom(i)%topol_label)
    ! code:
-   !  element@C_H_O_N_P_S_Zn_Cd_He_Ar_Xe 
+   !  element@C_H_O_N_P_S_Zn_Cd_He_Ar_Xe
    !
    ! Nitrogen:
    case("N@2_0_0_0_0_0_1_0_0_0_0_")
@@ -455,13 +451,13 @@ program zif_cif2gin
      end if
     end do
    end if
-  end do scan_for_rename_H_atoms 
+  end do scan_for_rename_H_atoms
 !
   do i=1,n_atoms
    if(atom(i)%new_label/="Xxxx")then
     atom(i)%label=atom(i)%new_label
    end if
-  end do 
+  end do
   ! }}
  end if
 ! atom types:
@@ -495,18 +491,18 @@ program zif_cif2gin
  write(987,'(100(a4,1x))') ( atom_types(i), i=1,n_atom_types)
  close(987)
  write(6,*)'=========='
-! lammps: 
+! lammps:
  if ( flag_lammps ) then
-! bonds: 
+! bonds:
  allocate(bond_type_string(bond_types_max))
  allocate(bond_type_histogram(bond_types_max))
  allocate(bond(n_bonds_max))
  bond_type_histogram=0
  bond_string(1:8)="        "
  do i=1,bond_types_max
-  do j=1,8 
+  do j=1,8
    write(bond_type_string(j:j),'(a1)')" "
-  end do 
+  end do
  end do
  forall (i=1:n_bonds_max)
   forall (j=1:80)
@@ -706,7 +702,7 @@ program zif_cif2gin
  end forall
 !   l
 !  .|.
-!   i - j 
+!   i - j
 !   |
 !   k
  do_i_impr: do i=1,n_atoms
@@ -773,12 +769,12 @@ program zif_cif2gin
  end do do_i_impr
  write(6,*)'Bond types:',n_bond_types
  write(6,*)'bonds:',n_bonds
- do i=1,n_bond_types 
+ do i=1,n_bond_types
   write(6,*) bond_type_string(i),bond_type_histogram(i)
  end do
  write(6,*)'Bend types:',n_bend_types
  write(6,*)'bends:',n_bends
- do i=1,n_bend_types 
+ do i=1,n_bend_types
   write(6,*) bend_type_string(i),bend_type_histogram(i)
  end do
  write(6,*)'Dihedral types:',n_tors_types
@@ -800,7 +796,7 @@ program zif_cif2gin
  deallocate(bend)
  deallocate(bond_type_string)
  deallocate(bond_type_histogram)
- end if 
+ end if
  call output_gulp()
  call output_pdb()
  call output_CIF()
@@ -939,7 +935,7 @@ program zif_cif2gin
         case default
          write(6,'(a,1x,a)')'Unknown bond potential:', adjustl(trim(type_fff))
          stop
-        end select 
+        end select
        else
         write(string,*) 0.0,0.0,' # ',type_fff
        end if
@@ -963,7 +959,7 @@ program zif_cif2gin
       string(1:4)="none"
       exit fff
      end if
-     if(line(1:1)/="#".or.line(1:1)/=" ")then 
+     if(line(1:1)/="#".or.line(1:1)/=" ")then
       read(line,'(3(a4,1x),a)')ourlabel(1),ourlabel(2),ourlabel(3),passing
       if((adjustl(trim(ourlabel(2)))==adjustl(trim(label(2))).and.&
           adjustl(trim(ourlabel(1)))==adjustl(trim(label(1))).and.&
@@ -1254,7 +1250,7 @@ program zif_cif2gin
   end do
   write(u,'(a)') "library GenericZIF"
   write(u,'(a)') "#switch_minimiser rfo gnorm 0.05"
-  write(u,'(a)') "stepmx opt 0.1" 
+  write(u,'(a)') "stepmx opt 0.1"
   write(u,'(a)') 'dump every 1 optimise.grs'
   close(u)
  end subroutine output_gulp
@@ -1287,7 +1283,7 @@ program zif_cif2gin
   write(u,*)' '
   write(u,*)n_atoms,' atoms'
   write(u,*)n_bonds,' bonds'
-  write(u,*)n_bends,' angles' 
+  write(u,*)n_bends,' angles'
   write(u,*)n_torss,' dihedrals'
   write(u,*)n_imprs,' impropers'
   write(u,*)' '
@@ -1370,7 +1366,7 @@ program zif_cif2gin
   write(u,*)' '
   do i=1,n_atoms
    write(u,'(i5,1x,i3,1x,i3,1x,f10.7,1x,3(f14.7,1x))')i,1,atom(i)%type_,atom(i)%charge,(atom(i)%xyzc(j,1),j=1,3)
-  end do 
+  end do
   write(u,*)' '
   write(u,'(a)')'Bonds'
   write(u,*)' '
@@ -1446,7 +1442,7 @@ program zif_cif2gin
   !ylo_bound = ylo + MIN(0.0,yz)
   !yhi_bound = yhi + MAX(0.0,yz)
   !zlo_bound = zlo
-  !zhi_bound = zhi 
+  !zhi_bound = zhi
   return
  end subroutine cellnormal2lammps
 
@@ -1630,7 +1626,7 @@ program zif_cif2gin
   integer            :: i,j
   real               :: temp(6)
   REAL               :: radtodeg
-  REAL, PARAMETER    :: pi=ACOS(-1.0) 
+  REAL, PARAMETER    :: pi=ACOS(-1.0)
   radtodeg=180.0/PI
   do i = 1,3
     temp(i) = 0.0
@@ -1808,7 +1804,7 @@ end function
  END FUNCTION
 !
  real function K2eV(x)
-  implicit none 
+  implicit none
   real    :: x
   real,parameter :: kB_1=11604.52211052
   K2eV=x/kB_1
@@ -1835,10 +1831,8 @@ end function
  subroutine print_help()
     print '(a)', '  -h, --help   print usage information and exit'
     print '(a)', '  -c, --cif    CIF File input'
-    print '(a)', '  -l, --linker [imi] imi, mimi'
     print '(a)', '  -GCMC, --adsorption [1e5] pressure Pa'
     print '(a)', '  -T, --temperatue  -T, [298] temperature in Kelvin'
     print '(a)', '  -fff, --forcefield [WHCJ] WHCJ, HZJ'
  end subroutine print_help
 end program zif_cif2gin
-
